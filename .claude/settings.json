@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.instagram.com)",
+      "WebFetch(domain:messenger.abeto.co)",
+      "WebFetch(domain:thepekoetrail.org)",
+      "Bash(python -I /c/Users/dinusha/AppData/Local/Temp/claude/d--Project-Github-pekoe-trail/0a451d69-02b3-4000-ba2a-a6c4de202d53/scratchpad/snap_pois.py /d/Project/Github/pekoe-trail/the-pekoe-trail-stage-1-hantana-to-galaha-official-profile.gpx /c/Users/dinusha/AppData/Local/Temp/claude/d--Project-Github-pekoe-trail/0a451d69-02b3-4000-ba2a-a6c4de202d53/scratchpad/pois.json)",
+      "Bash(python -I /c/Users/dinusha/AppData/Local/Temp/claude/d--Project-Github-pekoe-trail/0a451d69-02b3-4000-ba2a-a6c4de202d53/scratchpad/overpass_near.py /d/Project/Github/pekoe-trail/the-pekoe-trail-stage-1-hantana-to-galaha-official-profile.gpx /c/Users/dinusha/AppData/Local/Temp/claude/d--Project-Github-pekoe-trail/0a451d69-02b3-4000-ba2a-a6c4de202d53/scratchpad/osm_near.json)",
+      "Bash(sed -i 's#https://overpass-api.de/api/interpreter#https://overpass.kumi.systems/api/interpreter#' /c/Users/dinusha/AppData/Local/Temp/claude/d--Project-Github-pekoe-trail/0a451d69-02b3-4000-ba2a-a6c4de202d53/scratchpad/overpass_near.py)",
+      "Bash(awk 'NR%3==1')",
+      "Bash(sed -E 's/lat=\"\\([0-9.]+\\)\" lon=\"\\([0-9.]+\\)\"/\\\\1,\\\\2/')",
+      "Bash(python -I -c ' *)",
+      "Bash(mkdir -p /d/Project/Github/pekoe-trail/data)",
+      "Bash(python -I __TRACKED_VAR__/build_landmarks.py /d/Project/Github/pekoe-trail/the-pekoe-trail-stage-1-hantana-to-galaha-official-profile.gpx /d/Project/Github/pekoe-trail/data/stage-01-landmarks.json)",
+      "mcp__claude-in-chrome__tabs_context_mcp",
+      "ClaudeInChromeDomain(127.0.0.1:8765)"
+    ]
+  }
+}

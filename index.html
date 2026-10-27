@@ -1,0 +1,1565 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Pekoe Trail Walk · Stage 1</title>
+<link rel="icon" type="image/png" href="photos/logo.png">
+<style>
+  :root {
+    --ink: #1f2a22; --muted: #5b6b5e; --paper: rgba(250, 247, 238, 0.92);
+    --accent: #c9772e; --leaf: #3f7d3a; --line: rgba(31, 42, 34, 0.14);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #dfe3d3; color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-user-select: none; user-select: none; }
+  canvas#c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  .panel { background: var(--paper); border: 1px solid var(--line); border-radius: 14px;
+    box-shadow: 0 6px 24px rgba(0,0,0,.12); backdrop-filter: blur(6px); }
+  .hidden { display: none !important; }
+
+  #hud { position: fixed; top: 12px; left: 12px; right: 12px; display: flex; gap: 10px; align-items: center;
+    justify-content: space-between; pointer-events: none; }
+  #hud .panel { padding: 8px 14px; font-size: 14px; }
+  #stageName { font-weight: 650; }
+  #stageName small { font-weight: 500; color: var(--muted); }
+  #stats { display: flex; gap: 14px; font-variant-numeric: tabular-nums; }
+  #stats b { font-weight: 650; }
+
+  #profileWrap { position: fixed; left: 12px; right: 12px; bottom: 28px; max-width: 900px; margin: 0 auto;
+    padding: 6px 8px; pointer-events: none; }
+  #profile { width: 100%; height: 64px; display: block; }
+
+  #prompt { position: fixed; left: 50%; bottom: 118px; transform: translateX(-50%); padding: 8px 14px;
+    font-size: 14px; cursor: pointer; pointer-events: auto; white-space: nowrap; }
+  #prompt kbd { font: inherit; font-weight: 650; border: 1px solid var(--line); border-radius: 5px; padding: 0 5px; background: #fff; }
+
+  #hint { position: fixed; left: 50%; top: 64px; transform: translateX(-50%); font-size: 13px; color: var(--muted);
+    padding: 6px 12px; pointer-events: none; transition: opacity .8s; }
+
+  #ctrlBar { position: fixed; right: 12px; bottom: 112px; display: flex; gap: 6px; padding: 6px; }
+  #ctrlBar button { min-width: 44px; height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px;
+    background: #fff; color: var(--ink); font: 600 14px system-ui, sans-serif; cursor: pointer; touch-action: none; }
+  #ctrlBar button.on { background: var(--leaf); border-color: var(--leaf); color: #fff; }
+  .logo { width: 96px; height: 96px; display: block; margin: 0 auto 6px; }
+
+  #credits { position: fixed; left: 0; right: 0; bottom: 4px; text-align: center; font-size: 10.5px;
+    color: rgba(31,42,34,.7); pointer-events: auto; }
+  #credits a { color: inherit; }
+
+  .overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: rgba(30, 40, 32, 0.35); padding: 16px; z-index: 10; }
+  .dialog { width: min(560px, 100%); padding: 24px; text-align: center; }
+  .dialog h1 { margin: 0 0 4px; font-size: 26px; }
+  .dialog h1 span { color: var(--leaf); }
+  .dialog p { color: var(--muted); line-height: 1.5; margin: 8px 0; }
+  .btn { margin-top: 14px; padding: 11px 26px; font-size: 16px; font-weight: 650; border: 0; border-radius: 999px;
+    background: var(--accent); color: #fff; cursor: pointer; }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin: 16px 0 6px; }
+  .bar div { height: 100%; width: 0; background: var(--leaf); transition: width .2s; }
+  #loadLabel { font-size: 12px; color: var(--muted); }
+  .controls { display: grid; grid-template-columns: auto auto; gap: 4px 14px; justify-content: center; font-size: 13px;
+    color: var(--muted); margin-top: 10px; text-align: left; }
+  .controls b { color: var(--ink); font-weight: 600; }
+
+  #card { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px;
+    background: rgba(30, 40, 32, 0.4); z-index: 9; }
+  #cardBox { width: min(760px, 100%); max-height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+  #cardMedia { position: relative; background: #2c3a2e; aspect-ratio: 16 / 10; flex: 0 1 auto; min-height: 0; }
+  #cardImg { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .navBtn { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%;
+    border: 0; background: rgba(250,247,238,.85); font-size: 20px; cursor: pointer; }
+  #prevBtn { left: 10px; } #nextBtn { right: 10px; }
+  #photoCount { position: absolute; right: 10px; bottom: 10px; font-size: 12px; color: #fff;
+    background: rgba(0,0,0,.45); border-radius: 999px; padding: 2px 8px; }
+  #photoCredit { position: absolute; left: 10px; bottom: 10px; max-width: 70%; font-size: 11px; color: #fff;
+    background: rgba(0,0,0,.45); border-radius: 999px; padding: 2px 8px; text-decoration: none;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #cardBody { padding: 14px 18px 16px; overflow: auto; }
+  #cardBody h2 { margin: 0; font-size: 20px; }
+  #cardMeta { color: var(--accent); font-size: 13px; font-weight: 600; margin: 3px 0 8px; font-variant-numeric: tabular-nums; }
+  #cardText { margin: 0; line-height: 1.5; color: #334036; }
+  #cardStory { margin: 10px 0 0; padding: 8px 12px; border-left: 3px solid var(--accent); background: rgba(201,119,46,.08);
+    border-radius: 0 8px 8px 0; font-style: italic; line-height: 1.45; }
+  #cardStory::before { content: "Our walk: "; font-style: normal; font-weight: 650; color: var(--accent); }
+  #cardClose { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border-radius: 50%; border: 0;
+    background: rgba(250,247,238,.9); font-size: 18px; cursor: pointer; z-index: 2; }
+  #cardFoot { margin-top: 12px; font-size: 12px; color: var(--muted); }
+
+  @media (max-width: 560px) {
+    #hud { flex-direction: column; align-items: stretch; }
+    #hud .panel { font-size: 13px; padding: 6px 10px; }
+    #stats { justify-content: space-between; }
+    #hint { top: 92px; }
+    #ctrlBar { left: 12px; justify-content: space-between; }
+    #ctrlBar button { padding: 0 8px; }
+    #prompt { bottom: 172px; }
+  }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="hud" class="hidden">
+  <div class="panel" id="stageName">Stage 1 · Hanthana → Galaha <small>Pekoe Trail, Sri Lanka</small></div>
+  <div class="panel" id="stats">
+    <span><b id="distVal">0.00</b> / <span id="distTotal">12.84</span> km</span>
+    <span><b id="eleVal">781</b> m</span>
+    <span>★ <b id="seenVal">0</b>/<span id="seenTotal">0</span></span>
+  </div>
+</div>
+<div id="hint" class="panel hidden"></div>
+<div id="profileWrap" class="panel hidden"><canvas id="profile"></canvas></div>
+<div id="prompt" class="panel hidden"></div>
+<div id="ctrlBar" class="panel hidden">
+  <button id="btnRestart" title="Start again from the beginning" aria-label="Start again">⏮</button>
+  <button id="btnBack" title="Walk back (hold)" aria-label="Walk back">↶</button>
+  <button id="btnWalk" title="Start / stop walking (Space)">▶ Walk</button>
+  <button id="btnSpeed" title="Walking speed">1×</button>
+  <button id="btnRun" title="Run (Shift)">Run</button>
+  <button id="btnLookL" title="Look left (hold, A)" aria-label="Look left">⟲</button>
+  <button id="btnLookR" title="Look right (hold, D)" aria-label="Look right">⟳</button>
+</div>
+<div id="credits">
+  Route: <a href="https://thepekoetrail.org/pekoe-stages/stage-01/" target="_blank" rel="noopener">The Pekoe Trail</a> (Wikiloc GPX) ·
+  Terrain: AWS Terrain Tiles (Mapzen, SRTM/USGS) · Places: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors ·
+  Gallery photos, stage map &amp; logo: thepekoetrail.org ·
+  Extra photos: <a href="https://commons.wikimedia.org/" target="_blank" rel="noopener">Wikimedia Commons</a> (CC BY-SA, credited on each photo)
+</div>
+
+<div id="start" class="overlay">
+  <div class="dialog panel">
+    <img class="logo" src="photos/logo.png" alt="The Pekoe Trail logo">
+    <h1>The Pekoe Trail · <span>Stage 1</span></h1>
+    <p>Walk 12.8 km from the Ceylon Tea Museum in Hanthana to Galaha, on the real route and terrain, through tea estates, pine forest and the Katusu Konda cliffs.</p>
+    <div class="bar"><div id="loadBar"></div></div>
+    <div id="loadLabel">Loading…</div>
+    <div class="controls" id="controlsHelp"></div>
+    <button class="btn" id="startBtn" disabled>Start walk</button>
+  </div>
+</div>
+
+<div id="finish" class="overlay hidden">
+  <div class="dialog panel">
+    <img class="logo" src="photos/logo.png" alt="The Pekoe Trail logo">
+    <h1>Stage 1 <span>complete</span></h1>
+    <p id="finishStats"></p>
+    <button class="btn" id="againBtn">Walk again</button>
+  </div>
+</div>
+
+<div id="card" class="hidden">
+  <div id="cardBox" class="panel" style="position:relative">
+    <button id="cardClose" aria-label="Close">✕</button>
+    <div id="cardMedia">
+      <img id="cardImg" alt="">
+      <button class="navBtn" id="prevBtn" aria-label="Previous photo">‹</button>
+      <button class="navBtn" id="nextBtn" aria-label="Next photo">›</button>
+      <span id="photoCount"></span>
+      <a id="photoCredit" class="hidden" target="_blank" rel="noopener"></a>
+    </div>
+    <div id="cardBody">
+      <h2 id="cardTitle"></h2>
+      <div id="cardMeta"></div>
+      <p id="cardText"></p>
+      <p id="cardStory" class="hidden"></p>
+      <div id="cardFoot">Press <b>Esc</b> or tap outside to keep walking</div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+
+// ---------- config ----------
+const isTouch = matchMedia('(pointer: coarse)').matches;
+const CONFIG = {
+  gpx: 'the-pekoe-trail-stage-1-hantana-to-galaha-official-profile.gpx',
+  landmarks: 'data/stage-01-landmarks.json',
+  terrainDir: 'data/terrain/',
+  VERT_EXAG: 1.5,        // vertical exaggeration so hills read on screen
+  BASE_ELE: 700,         // metres mapped to y = 0
+  CELL: isTouch ? 48 : 36, // terrain grid spacing (m)
+  MARGIN: 2200,          // terrain beyond the route bbox (m)
+  SAMPLE_M: 5,           // trail resample spacing (m)
+  WALK_SPEED: 30, RUN_SPEED: 60, // m/s (fast-travel scale: ~7 min for the stage)
+  TRIGGER_M: 60,         // landmark trigger distance along the trail
+  PROPS: isTouch ? 7000 : 12000,
+  SHADOWS: !isTouch,
+};
+// km ranges (GPX distance) -> zone
+const ZONES = [
+  [0.0, 0.3, 'museum'], [0.3, 5.2, 'tea'], [5.2, 5.8, 'pine'], [5.8, 7.2, 'rock'],
+  [7.2, 10.4, 'teaforest'], [10.4, 11.3, 'pine'], [11.3, 12.0, 'river'], [12.0, 99, 'village'],
+];
+const GROUND = {
+  museum: '#7fae55', tea: '#68a845', pine: '#55895a', rock: '#628d48',
+  teaforest: '#5d9c45', river: '#5c9a4d', village: '#86a75a',
+};
+// prop mix per zone: [tea, shade tree, pine, boulder, house]
+const MIX = {
+  museum: [1, .35, 0, 0, .06], tea: [1, .3, .03, .04, .02], pine: [.15, .1, 1, .35, 0],
+  rock: [.1, .6, .12, .55, 0], teaforest: [.7, .6, .04, .06, .02], river: [.2, .8, .05, .25, .05],
+  village: [.3, .4, 0, .02, .3],
+};
+// real-world positions (OpenStreetMap) of modelled landmarks
+const SITE_PROPS = [
+  { type: 'factory', lat: 7.26864, lon: 80.63266 },
+  { type: 'stupa', lat: 7.26223, lon: 80.63683, side: 'left' }, // seen on the left in the first km
+  { type: 'postoffice', lat: 7.19746, lon: 80.66868 },
+];
+const DEBUG = new URLSearchParams(location.search).has('debug');
+const DEG = Math.PI / 180;
+const $ = (id) => document.getElementById(id);
+
+// ---------- helpers ----------
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+function mulberry32(a) {
+  return () => { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+function haversine(a, b) {
+  const p1 = a.lat * DEG, p2 = b.lat * DEG, dl = (b.lon - a.lon) * DEG;
+  const h = Math.sin((p2 - p1) / 2) ** 2 + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) ** 2;
+  return 12742000 * Math.asin(Math.sqrt(h));
+}
+function angleLerp(a, b, t) { let d = ((b - a + Math.PI) % (2 * Math.PI)) - Math.PI; if (d < -Math.PI) d += 2 * Math.PI; return a + d * t; }
+async function fetchOk(url) { const r = await fetch(url); if (!r.ok) throw new Error(`${url}: HTTP ${r.status}`); return r; }
+const nextFrame = () => new Promise((r) => requestAnimationFrame(() => r()));
+const loadImage = (src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error(src)); i.src = src; });
+function setProgress(f, label) { $('loadBar').style.width = `${Math.round(f * 100)}%`; $('loadLabel').textContent = label; }
+function fail(msg) { $('loadLabel').innerHTML = msg; $('loadLabel').style.color = '#a33'; throw new Error(msg); }
+
+$('controlsHelp').innerHTML = isTouch
+  ? '<b>▶ Walk</b><span>start / stop walking</span><b>1× / 2×</b><span>walking speed</span><b>Run</b><span>run on / off</span><b>↶ · ⟲ ⟳</b><span>walk back · look around (hold)</span><b>Hold screen</b><span>walk forward</span><b>Drag</b><span>look around</span><b>Tap ★ prompt</b><span>reopen a landmark</span>'
+  : '<b>W / ↑</b><span>walk forward</span><b>S / ↓</b><span>walk back</span><b>Space</b><span>start / stop walking</span><b>Shift</b><span>run</span><b>A / D</b><span>look left / right</span><b>Drag mouse</b><span>look around</span><b>E</b><span>reopen nearby landmark</span><b>Buttons</b><span>walk, 1× / 2× speed, run, look</span>';
+
+if (location.protocol === 'file:') {
+  fail('This page loads data files, so open it through a local web server, e.g. <code>npx serve</code> or <code>python -m http.server</code>, then visit http://localhost:…');
+}
+
+// ---------- data loading ----------
+async function loadGPX(url) {
+  const doc = new DOMParser().parseFromString(await (await fetchOk(url)).text(), 'application/xml');
+  const pts = [...doc.getElementsByTagName('trkpt')].map((p) => ({
+    lat: +p.getAttribute('lat'), lon: +p.getAttribute('lon'),
+    ele: +(p.getElementsByTagName('ele')[0]?.textContent ?? 0),
+  }));
+  if (pts.length < 2) throw new Error('GPX has no track points');
+  let d = 0;
+  pts.forEach((p, i) => { if (i) d += haversine(pts[i - 1], p); p.d = d; });
+  return pts;
+}
+
+async function loadDEM(onTile) {
+  const m = await (await fetchOk(CONFIG.terrainDir + 'manifest.json')).json();
+  const T = m.tileSize, W = (m.x1 - m.x0 + 1) * T, H = (m.y1 - m.y0 + 1) * T;
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d', { willReadFrequently: true });
+  let done = 0;
+  await Promise.all(m.tiles.map(async (name) => {
+    const [, tx, ty] = name.replace('.png', '').split('_').map(Number);
+    try {
+      const blob = await (await fetchOk(CONFIG.terrainDir + name)).blob();
+      const bmp = await createImageBitmap(blob, { colorSpaceConversion: 'none', premultiplyAlpha: 'none' });
+      ctx.drawImage(bmp, (tx - m.x0) * T, (ty - m.y0) * T);
+    } catch (e) { console.warn('Terrain tile missing, flattening that area:', name, e); }
+    onTile(++done / m.tiles.length);
+  }));
+  const px = ctx.getImageData(0, 0, W, H).data;
+  const h = new Float32Array(W * H);
+  const valid = [];
+  for (let i = 0; i < W * H; i++) {
+    if (px[i * 4 + 3] === 0) { h[i] = NaN; continue; }
+    h[i] = px[i * 4] * 256 + px[i * 4 + 1] + px[i * 4 + 2] / 256 - 32768;
+    if (i % 97 === 0) valid.push(h[i]);
+  }
+  valid.sort((a, b) => a - b);
+  const median = valid.length ? valid[valid.length >> 1] : CONFIG.BASE_ELE;
+  for (let i = 0; i < h.length; i++) if (Number.isNaN(h[i])) h[i] = median;
+
+  const worldPx = 2 ** m.zoom * T;
+  function sample(lat, lon) {
+    const x = (lon + 180) / 360 * worldPx - m.x0 * T;
+    const r = lat * DEG;
+    const y = (1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * worldPx - m.y0 * T;
+    const fx = clamp(x - 0.5, 0, W - 1.001), fy = clamp(y - 0.5, 0, H - 1.001);
+    const ix = fx | 0, iy = fy | 0, tx = fx - ix, ty = fy - iy;
+    const a = h[iy * W + ix], b = h[iy * W + ix + 1], c = h[(iy + 1) * W + ix], d = h[(iy + 1) * W + ix + 1];
+    return lerp(lerp(a, b, tx), lerp(c, d, tx), ty);
+  }
+  return { sample, manifest: m };
+}
+
+// ---------- world state ----------
+let proj, grid, trail, gpx, gpxLen, landmarks = [];
+const eleToY = (e) => (e - CONFIG.BASE_ELE) * CONFIG.VERT_EXAG;
+
+function makeProjection(pts) {
+  const lats = pts.map((p) => p.lat), lons = pts.map((p) => p.lon);
+  const lat0 = (Math.min(...lats) + Math.max(...lats)) / 2, lon0 = (Math.min(...lons) + Math.max(...lons)) / 2;
+  const KX = 111320 * Math.cos(lat0 * DEG), KZ = 110574;
+  return {
+    toXZ: (lat, lon) => [(lon - lon0) * KX, -(lat - lat0) * KZ],
+    toLL: (x, z) => [lat0 - z / KZ, lon0 + x / KX],
+  };
+}
+
+function buildGrid(dem, bounds) {
+  const C = CONFIG.CELL, M = CONFIG.MARGIN;
+  const gx0 = bounds.minX - M, gz0 = bounds.minZ - M;
+  const nx = Math.ceil((bounds.maxX - bounds.minX + 2 * M) / C) + 1;
+  const nz = Math.ceil((bounds.maxZ - bounds.minZ + 2 * M) / C) + 1;
+  const H = new Float32Array(nx * nz);
+  for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) {
+    const [lat, lon] = proj.toLL(gx0 + i * C, gz0 + j * C);
+    H[j * nx + i] = eleToY(dem.sample(lat, lon));
+  }
+  return { gx0, gz0, nx, nz, C, H };
+}
+
+// exact height of the rendered terrain triangles (same diagonal split as the mesh)
+function heightAt(x, z) {
+  const { gx0, gz0, nx, nz, C, H } = grid;
+  const fi = clamp((x - gx0) / C, 0, nx - 1.0001), fj = clamp((z - gz0) / C, 0, nz - 1.0001);
+  const i = fi | 0, j = fj | 0, u = fi - i, v = fj - j;
+  const a = H[j * nx + i], b = H[j * nx + i + 1], c = H[(j + 1) * nx + i], d = H[(j + 1) * nx + i + 1];
+  return u + v <= 1 ? a + (b - a) * u + (c - a) * v : d + (c - d) * (1 - u) + (b - d) * (1 - v);
+}
+
+function buildTrail() {
+  const ctrl = [];
+  for (const p of gpx) {
+    const [x, z] = proj.toXZ(p.lat, p.lon);
+    const last = ctrl[ctrl.length - 1];
+    if (!last || Math.hypot(last.x - x, last.z - z) > 1) ctrl.push(new THREE.Vector3(x, 0, z));
+  }
+  const curve = new THREE.CatmullRomCurve3(ctrl, false, 'centripetal');
+  const N = Math.ceil(curve.getLength() / CONFIG.SAMPLE_M);
+  const sp = curve.getSpacedPoints(N);
+  const n = sp.length, x = new Float32Array(n), z = new Float32Array(n), y = new Float32Array(n);
+  let len = 0;
+  sp.forEach((p, i) => { x[i] = p.x; z[i] = p.z; if (i) len += Math.hypot(x[i] - x[i - 1], z[i] - z[i - 1]); });
+  trail = { n, x, z, y, len, step: len / (n - 1), buckets: new Map(), B: 100 };
+  const key = (ix, iz) => (ix + 10000) * 100000 + (iz + 10000);
+  trail.key = key;
+  for (let i = 0; i < n; i++) {
+    const k = key(Math.floor(x[i] / trail.B), Math.floor(z[i] / trail.B));
+    if (!trail.buckets.has(k)) trail.buckets.set(k, []);
+    trail.buckets.get(k).push(i);
+  }
+}
+
+function nearestTrail(x, z, maxR) {
+  const { B, buckets, key } = trail, R = Math.ceil(maxR / B);
+  const cx = Math.floor(x / B), cz = Math.floor(z / B);
+  let best = Infinity, bi = -1;
+  for (let dx = -R; dx <= R; dx++) for (let dz = -R; dz <= R; dz++) {
+    const arr = buckets.get(key(cx + dx, cz + dz)); if (!arr) continue;
+    for (const i of arr) { const d2 = (trail.x[i] - x) ** 2 + (trail.z[i] - z) ** 2; if (d2 < best) { best = d2; bi = i; } }
+  }
+  return best <= maxR * maxR ? { d: Math.sqrt(best), i: bi } : { d: Infinity, i: -1 };
+}
+
+const kmToS = (km) => clamp(km * 1000 / gpxLen * trail.len, 0, trail.len);
+const sToKm = (s) => s / trail.len * gpxLen / 1000;
+const idxToKm = (i) => sToKm(i * trail.step);
+function zoneAtKm(km) { for (const [a, b, z] of ZONES) if (km >= a && km < b) return z; return 'village'; }
+function eleAtS(s) {
+  const d = s / trail.len * gpxLen;
+  let lo = 0, hi = gpx.length - 1;
+  while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (gpx[mid].d < d) lo = mid; else hi = mid; }
+  const a = gpx[lo], b = gpx[hi]; return lerp(a.ele, b.ele, clamp((d - a.d) / Math.max(b.d - a.d, 1e-6), 0, 1));
+}
+function posAt(s, out) {
+  const f = clamp(s / trail.step, 0, trail.n - 1.0001), i = f | 0, t = f - i;
+  return out.set(lerp(trail.x[i], trail.x[i + 1], t), lerp(trail.y[i], trail.y[i + 1], t), lerp(trail.z[i], trail.z[i + 1], t));
+}
+function tangentAt(s, span = 2) {
+  const i = Math.round(clamp(s / trail.step, 0, trail.n - 1));
+  const a = Math.max(0, i - span), b = Math.min(trail.n - 1, i + span);
+  const dx = trail.x[b] - trail.x[a], dz = trail.z[b] - trail.z[a], l = Math.hypot(dx, dz) || 1;
+  return { x: dx / l, z: dz / l };
+}
+
+// ---------- renderer / scene ----------
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas: $('c'), antialias: true, powerPreference: 'high-performance' });
+} catch (e) {
+  fail('Your browser could not start WebGL, which this walk needs. Try a recent Chrome, Edge, Firefox or Safari.');
+}
+renderer.setPixelRatio(Math.min(devicePixelRatio, isTouch ? 1.5 : 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = CONFIG.SHADOWS;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const scene = new THREE.Scene();
+const FOG = new THREE.Color('#dfe3d3');
+scene.fog = new THREE.Fog(FOG, 350, 5200);
+const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.5, 40000);
+
+const hemi = new THREE.HemisphereLight('#d6e9ff', '#58743a', 1.25);
+scene.add(hemi);
+const sun = new THREE.DirectionalLight('#fff0d4', 2.6);
+const SUN_DIR = new THREE.Vector3(-0.55, 0.75, 0.35).normalize();
+sun.castShadow = CONFIG.SHADOWS;
+sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -90, right: 90, top: 90, bottom: -90, near: 10, far: 600 });
+sun.shadow.bias = -0.0008; sun.shadow.normalBias = 0.6;
+scene.add(sun, sun.target);
+
+const lambert = (opts) => new THREE.MeshLambertMaterial({ flatShading: true, ...opts });
+const propMat = lambert({ vertexColors: true });
+
+function makeSky() {
+  const mat = new THREE.ShaderMaterial({
+    side: THREE.BackSide, depthWrite: false, fog: false,
+    uniforms: { top: { value: new THREE.Color('#6fa6d6') }, mid: { value: FOG.clone() }, bottom: { value: new THREE.Color('#c7d5bd') } },
+    vertexShader: 'varying vec3 vP; void main(){ vP = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.); }',
+    fragmentShader: `uniform vec3 top; uniform vec3 mid; uniform vec3 bottom; varying vec3 vP;
+      void main(){ float h = vP.y; vec3 c = h > 0. ? mix(mid, top, pow(clamp(h*2.2,0.,1.),0.7)) : mix(mid, bottom, clamp(-h*4.,0.,1.));
+      gl_FragColor = vec4(c,1.);
+      #include <colorspace_fragment>
+      }`,
+  });
+  const sky = new THREE.Mesh(new THREE.SphereGeometry(30000, 32, 16), mat);
+  sky.renderOrder = -1;
+  return sky;
+}
+
+// distant hazy ridges beyond the DEM (Knuckles range to the north-east)
+function makeRidges() {
+  const group = new THREE.Group();
+  const rings = [{ r: 11000, base: 250, amp: 650, col: '#9fb3a6', seed: 3 }, { r: 15500, base: 500, amp: 1100, col: '#b9c6c4', seed: 7 }];
+  for (const ring of rings) {
+    const rnd = mulberry32(ring.seed), segs = 160, pos = [], col = [];
+    const c = new THREE.Color(ring.col), cTop = c.clone().lerp(new THREE.Color('#e6e8dc'), 0.35);
+    const hs = Array.from({ length: segs + 1 }, (_, k) => {
+      const a = k / segs * Math.PI * 2;
+      const knuckles = Math.exp(-(((a - 0.9) / 0.45) ** 2)) * 1.3; // a≈0.9 rad: north-east
+      return ring.base + ring.amp * (0.35 + 0.65 * rnd()) * (0.6 + knuckles);
+    });
+    hs[segs] = hs[0];
+    for (let k = 0; k < segs; k++) {
+      const a0 = k / segs * Math.PI * 2, a1 = (k + 1) / segs * Math.PI * 2;
+      const p = (a, y) => [Math.sin(a) * ring.r, y, -Math.cos(a) * ring.r];
+      const A = p(a0, -600), B = p(a1, -600), Ct = p(a0, hs[k]), D = p(a1, hs[k + 1]);
+      pos.push(...A, ...Ct, ...B, ...B, ...Ct, ...D);
+      for (const t of [0, 1, 0, 0, 1, 1]) { const cc = t ? cTop : c; col.push(cc.r, cc.g, cc.b); }
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+    group.add(new THREE.Mesh(g, new THREE.MeshBasicMaterial({ vertexColors: true, fog: false, side: THREE.DoubleSide })));
+  }
+  return group;
+}
+
+function buildTerrainMesh() {
+  const { gx0, gz0, nx, nz, C, H } = grid;
+  const nv = nx * nz, vd = new Float32Array(nv), vi = new Int32Array(nv);
+  for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) {
+    const r = nearestTrail(gx0 + i * C, gz0 + j * C, 320); vd[j * nx + i] = r.d; vi[j * nx + i] = r.i;
+  }
+  const tris = (nx - 1) * (nz - 1) * 2, pos = new Float32Array(tris * 9), col = new Float32Array(tris * 9);
+  const rnd = mulberry32(42), tmp = new THREE.Color(), PATH = new THREE.Color('#b98d5e'),
+    ROCK = new THREE.Color('#8b8c80'), WILD = new THREE.Color('#4d7c43'), HIGH = new THREE.Color('#6f8f63');
+  const ground = Object.fromEntries(Object.entries(GROUND).map(([k, v]) => [k, new THREE.Color(v)]));
+  let o = 0;
+  const vx = (k) => gx0 + (k % nx) * C, vz = (k) => gz0 + Math.floor(k / nx) * C;
+  function tri(a, b, c) {
+    const ax = vx(a), az = vz(a), bx = vx(b), bz = vz(b), cx = vx(c), cz = vz(c);
+    const ay = H[a], by = H[b], cy = H[c];
+    const ux = bx - ax, uy = by - ay, uz = bz - az, wx = cx - ax, wy = cy - ay, wz = cz - az;
+    const nX = uy * wz - uz * wy, nY = uz * wx - ux * wz, nZ = ux * wy - uy * wx;
+    const ny = nY / Math.hypot(nX, nY, nZ);
+    let k = a; if (vd[b] < vd[k]) k = b; if (vd[c] < vd[k]) k = c;
+    const d = vd[k];
+    // terrain cells are big (36 m), so the path itself is the ribbon; only tint the ground near it
+    const far = Number.isFinite(d) ? clamp((d - 140) / 180, 0, 1) : 1;
+    const base = vi[k] >= 0 ? ground[zoneAtKm(idxToKm(vi[k]))] : WILD;
+    tmp.copy(base).lerp(WILD, far).lerp(HIGH, clamp((ay - 380) / 300, 0, 0.5));
+    if (ny < 0.78) tmp.lerp(ROCK, clamp((0.78 - ny) / 0.18, 0, 1));
+    if (d < 6) tmp.lerp(PATH, 0.18);
+    tmp.multiplyScalar(0.93 + rnd() * 0.12);
+    for (const [x, y, z] of [[ax, ay, az], [bx, by, bz], [cx, cy, cz]]) {
+      pos[o] = x; pos[o + 1] = y; pos[o + 2] = z; col[o] = tmp.r; col[o + 1] = tmp.g; col[o + 2] = tmp.b; o += 3;
+    }
+  }
+  for (let j = 0; j < nz - 1; j++) for (let i = 0; i < nx - 1; i++) {
+    const a = j * nx + i, b = a + 1, c = a + nx, d = c + 1;
+    tri(a, c, b); tri(b, c, d);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  g.computeVertexNormals();
+  const mesh = new THREE.Mesh(g, lambert({ vertexColors: true }));
+  mesh.receiveShadow = true;
+  scene.add(mesh);
+  // skirt below the grid edge, lost in fog
+  const skirt = new THREE.Mesh(new THREE.PlaneGeometry(80000, 80000).rotateX(-Math.PI / 2), lambert({ color: '#557f48' }));
+  skirt.position.y = eleToY(380);
+  scene.add(skirt);
+}
+
+function buildTrailRibbon() {
+  const W = 4.2, n = trail.n, pos = new Float32Array(n * 6), idx = [];
+  for (let i = 0; i < n; i++) {
+    trail.y[i] = heightAt(trail.x[i], trail.z[i]);
+    const t = tangentAt(i * trail.step, 1), px = -t.z, pz = t.x;
+    const lx = trail.x[i] + px * W / 2, lz = trail.z[i] + pz * W / 2, rx = trail.x[i] - px * W / 2, rz = trail.z[i] - pz * W / 2;
+    pos.set([lx, heightAt(lx, lz) + 0.45, lz, rx, heightAt(rx, rz) + 0.45, rz], i * 6);
+    if (i) { const a = (i - 1) * 2; idx.push(a, a + 2, a + 1, a + 1, a + 2, a + 3); }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setIndex(idx); g.computeVertexNormals();
+  const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ color: '#d6b083', polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
+  m.receiveShadow = true;
+  scene.add(m);
+}
+
+// ---------- props ----------
+function colored(geo, hex) {
+  const g = geo.index ? geo.toNonIndexed() : geo, c = new THREE.Color(hex), n = g.attributes.position.count;
+  const a = new Float32Array(n * 3); for (let i = 0; i < n; i++) a.set([c.r, c.g, c.b], i * 3);
+  g.setAttribute('color', new THREE.BufferAttribute(a, 3));
+  return g;
+}
+const merge = (...parts) => mergeGeometries(parts);
+const PROP_GEOS = {
+  tea: () => merge(colored(new THREE.IcosahedronGeometry(1.35, 0).scale(1.35, 0.72, 1.1).translate(0, 0.75, 0), '#4f9a3a')),
+  shade: () => merge(
+    colored(new THREE.CylinderGeometry(0.22, 0.38, 10, 5).translate(0, 5, 0), '#6b5038'),
+    colored(new THREE.IcosahedronGeometry(3.2, 0).scale(1, 0.7, 1).translate(0, 10.5, 0), '#5f9443'),
+    colored(new THREE.IcosahedronGeometry(2.2, 0).scale(1, 0.7, 1).translate(1.4, 8.3, 0.6), '#6aa04a')),
+  pine: () => merge(
+    colored(new THREE.CylinderGeometry(0.28, 0.45, 13, 5).translate(0, 6.5, 0), '#5c4632'),
+    colored(new THREE.ConeGeometry(3.1, 6, 7).translate(0, 9, 0), '#2f5e44'),
+    colored(new THREE.ConeGeometry(2.5, 5, 7).translate(0, 12.3, 0), '#336649'),
+    colored(new THREE.ConeGeometry(1.7, 4, 7).translate(0, 15.2, 0), '#3a6e50')),
+  rock: () => merge(colored(new THREE.DodecahedronGeometry(1.9, 0).scale(1.2, 0.75, 1).translate(0, 0.6, 0), '#8d8d82')),
+  house: () => merge(
+    colored(new THREE.BoxGeometry(6, 4, 7).translate(0, 2, 0), '#ece4d2'),
+    colored(new THREE.ConeGeometry(1, 1, 4).rotateY(Math.PI / 4).scale(6.6 / 1.414 * 1.1, 2.6, 7.6 / 1.414 * 1.1).translate(0, 5.3, 0), '#b4553c')),
+};
+const TYPES = ['tea', 'shade', 'pine', 'rock', 'house'];
+const TINTS = { tea: ['#ffffff', '#e6f5d8', '#f4ffe6'], shade: ['#ffffff', '#e8f2dc', '#fff4e0'], pine: ['#ffffff', '#e3efe8'],
+  rock: ['#ffffff', '#ece8dc', '#dcdcd4'], house: ['#ffffff', '#ffe9c9', '#d9ecff', '#f7d6d0', '#e5f2d2'] };
+
+function scatterProps() {
+  const rnd = mulberry32(1234), dummy = new THREE.Object3D(), c = new THREE.Color();
+  const buckets = Object.fromEntries(TYPES.map((t) => [t, []]));
+  const slopeAt = (x, z) => Math.hypot(heightAt(x + 2, z) - heightAt(x - 2, z), heightAt(x, z + 2) - heightAt(x, z - 2)) / 4;
+  for (let n = 0; n < CONFIG.PROPS; n++) {
+    const i = Math.floor(rnd() * trail.n), zone = zoneAtKm(idxToKm(i)), mix = MIX[zone];
+    let r = rnd() * mix.reduce((a, b) => a + b, 0), ti = 0;
+    while (r > mix[ti]) { r -= mix[ti]; ti++; }
+    const type = TYPES[Math.min(ti, TYPES.length - 1)];
+    const t = tangentAt(i * trail.step, 3), side = rnd() < 0.5 ? -1 : 1;
+    const dist = type === 'house' ? 14 + rnd() * 45 : 7 + rnd() ** 1.7 * 290;
+    const along = (rnd() - 0.5) * 30;
+    const bx = trail.x[i] - t.z * dist * side + t.x * along, bz = trail.z[i] + t.x * dist * side + t.z * along;
+    const rows = type === 'tea' ? 5 : 1;
+    for (let k = 0; k < rows; k++) {
+      const off = (k - (rows - 1) / 2) * 2.9;
+      const x = bx + t.x * off, z = bz + t.z * off;
+      if (nearestTrail(x, z, 12).d < (type === 'house' ? 10 : 5.5)) continue;
+      const sl = slopeAt(x, z);
+      if ((type === 'tea' && sl > 1.1) || (type === 'house' && sl > 0.45) || sl > 1.6) continue;
+      dummy.position.set(x, heightAt(x, z) - 0.25, z);
+      dummy.rotation.set(0, type === 'house' ? Math.atan2(-t.z * side, t.x * side) : rnd() * Math.PI * 2, 0);
+      const s = type === 'tea' ? 0.85 + rnd() * 0.3 : type === 'rock' ? 0.5 + rnd() * 1.6 : 0.75 + rnd() * 0.6;
+      dummy.scale.set(s, type === 'shade' || type === 'pine' ? s * (0.85 + rnd() * 0.4) : s, s);
+      dummy.updateMatrix();
+      const tints = TINTS[type];
+      buckets[type].push([dummy.matrix.clone(), tints[Math.floor(rnd() * tints.length)]]);
+    }
+  }
+  // roadside houses through the last 2 km into Galaha (two loose rows facing the road)
+  for (let s = trail.len - 2000; s < trail.len; s += 20) {
+    const i = Math.round(s / trail.step), t = tangentAt(s, 3);
+    for (const side of [-1, 1]) for (const [d0, d1] of [[12, 20], [30, 44]]) {
+      if (rnd() > 0.65) continue;
+      const dist = d0 + rnd() * (d1 - d0), along = (rnd() - 0.5) * 8;
+      const x = trail.x[i] - t.z * dist * side + t.x * along, z = trail.z[i] + t.x * dist * side + t.z * along;
+      if (nearestTrail(x, z, 12).d < 10 || slopeAt(x, z) > 0.6) continue;
+      dummy.position.set(x, heightAt(x, z) - 0.25, z);
+      dummy.rotation.set(0, Math.atan2(-t.z * side, t.x * side), 0);
+      const sc = 0.75 + rnd() * 0.5; dummy.scale.set(sc, sc * (0.9 + rnd() * 0.3), sc);
+      dummy.updateMatrix();
+      buckets.house.push([dummy.matrix.clone(), TINTS.house[Math.floor(rnd() * TINTS.house.length)]]);
+    }
+  }
+  for (const type of TYPES) {
+    const list = buckets[type]; if (!list.length) continue;
+    const mesh = new THREE.InstancedMesh(PROP_GEOS[type](), propMat, list.length);
+    list.forEach(([m, tint], k) => { mesh.setMatrixAt(k, m); mesh.setColorAt(k, c.set(tint)); });
+    mesh.castShadow = type !== 'tea'; mesh.receiveShadow = true;
+    mesh.computeBoundingSphere();
+    scene.add(mesh);
+  }
+  return Object.fromEntries(TYPES.map((t) => [t, buckets[t].length]));
+}
+
+function placeAt(obj, x, z, faceX, faceZ) {
+  obj.position.set(x, heightAt(x, z) - 0.6, z);
+  if (faceX !== undefined) obj.rotation.y = Math.atan2(faceX - x, faceZ - z);
+  obj.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  scene.add(obj);
+}
+function siteProps() {
+  for (const p of SITE_PROPS) {
+    let [x, z] = proj.toXZ(p.lat, p.lon);
+    const near = nearestTrail(x, z, 600);
+    const fx = near.i >= 0 ? trail.x[near.i] : x, fz = near.i >= 0 ? trail.z[near.i] : z + 1;
+    // keep big buildings clear of the path so they don't block the follow camera
+    const minGap = p.type === 'factory' ? 45 : p.type === 'stupa' ? 30 : 16;
+    if (p.side && near.i >= 0) {
+      // right-hand vector of the walking direction; mirror across the trail if the map side disagrees
+      const t = tangentAt(near.i * trail.step, 6), rx = -t.z, rz = t.x;
+      const dot = (x - fx) * rx + (z - fz) * rz;
+      p.resolvedSide = dot > 0 ? 'right' : 'left';
+      if (p.resolvedSide !== p.side) { x -= 2 * dot * rx; z -= 2 * dot * rz; }
+    }
+    if (near.i >= 0 && near.d < minGap) {
+      const dx = x - fx, dz = z - fz, l = Math.hypot(dx, dz) || 1;
+      x = fx + dx / l * minGap; z = fz + dz / l * minGap;
+    }
+    const g = new THREE.Group();
+    if (p.type === 'factory') {
+      g.add(new THREE.Mesh(new THREE.BoxGeometry(34, 20, 20).translate(0, 10, 0), lambert({ color: '#aab9c6' })));
+      g.add(new THREE.Mesh(new THREE.ConeGeometry(1, 1, 4).rotateY(Math.PI / 4).scale(34 / 1.414 * 1.08, 6, 20 / 1.414 * 1.08).translate(0, 23, 0), lambert({ color: '#7d8c99' })));
+      for (let f = 0; f < 4; f++) for (let w = 0; w < 8; w++) // window rows
+        g.add(new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.4, 0.3).translate(-14 + w * 4, 4 + f * 4.5, 10.05), lambert({ color: '#f4f1e6' })));
+      g.add(new THREE.Mesh(new THREE.BoxGeometry(18, 6, 9).translate(-5, 3, 14), lambert({ color: '#7f8f9c' })));
+      // nameboard above the entrance
+      g.add(new THREE.Mesh(new THREE.BoxGeometry(16.4, 2.8, 0.3).translate(-5, 7.6, 18.4), lambert({ color: '#4a1f1c' })));
+      const sign = new THREE.Mesh(new THREE.PlaneGeometry(16, 2.4), new THREE.MeshBasicMaterial({ map: boardTexture(1280, 192, (ctx, w, h) => {
+        ctx.fillStyle = '#6b2d2a'; ctx.fillRect(0, 0, w, h);
+        ctx.fillStyle = '#f3d27a'; fitText(ctx, 'CEYLON TEA MUSEUM', w / 2, h / 2, w - 80, 120, 800, 'center');
+      }) }));
+      sign.position.set(-5, 7.6, 18.56); g.add(sign);
+      museumTerrace(g);
+    } else if (p.type === 'stupa') {
+      const white = lambert({ color: '#f7f5ef' });
+      g.add(new THREE.Mesh(new THREE.CylinderGeometry(15, 16, 3, 24).translate(0, 1.5, 0), white));
+      g.add(new THREE.Mesh(new THREE.SphereGeometry(12.5, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2).translate(0, 3, 0), white));
+      g.add(new THREE.Mesh(new THREE.BoxGeometry(4, 2.6, 4).translate(0, 16.4, 0), white));
+      g.add(new THREE.Mesh(new THREE.ConeGeometry(1.5, 10, 10).translate(0, 22.7, 0), white));
+      g.add(new THREE.Mesh(new THREE.SphereGeometry(0.8, 8, 6).translate(0, 28, 0), lambert({ color: '#e3b341' })));
+    } else if (p.type === 'postoffice') {
+      g.add(new THREE.Mesh(new THREE.BoxGeometry(10, 5, 7).translate(0, 2.5, 0), lambert({ color: '#efe3c4' })));
+      g.add(new THREE.Mesh(new THREE.ConeGeometry(1, 1, 4).rotateY(Math.PI / 4).scale(10 / 1.414 * 1.12, 3, 7 / 1.414 * 1.12).translate(0, 6.5, 0), lambert({ color: '#a83a2f' })));
+      g.add(new THREE.Mesh(new THREE.BoxGeometry(10.2, 0.8, 0.3).translate(0, 4.2, 3.6), lambert({ color: '#b8312f' })));
+      g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 1.8, 10).translate(6.5, 0.9, 3), lambert({ color: '#c22f2a' })));
+    }
+    placeAt(g, x, z, fx, fz);
+  }
+}
+
+// top-floor tea shop & tea tasting hall on the museum front (after photos/Museum top floor-1.webp):
+// timber floor and gable roof, café tables, bench tables, tasting counter, tea-region banners; open front so it reads from the trail
+function museumTerrace(g) {
+  const rnd = mulberry32(99), m = (c) => lambert({ color: c }), FLOOR = 16, D = 7, ZF = 10 + D; // floor depth, front edge
+  const timber = m('#8a5a2e'), dark = m('#5a3a22'), floorMat = m('#b07a45');
+  g.add(new THREE.Mesh(new THREE.BoxGeometry(30, 0.6, D).translate(0, FLOOR - 0.3, 10 + D / 2), floorMat));
+  // gable roof on timber posts, with exposed beams
+  for (const sg of [-1, 1]) {
+    const slab = new THREE.Mesh(new THREE.BoxGeometry(31, 0.3, D * 0.62), timber);
+    slab.rotation.x = sg * 0.42; slab.position.set(0, FLOOR + 6.9, 10 + D / 2 + sg * D * 0.27); g.add(slab);
+  }
+  for (let x = -14.5; x <= 14.5; x += 4.8) {
+    g.add(new THREE.Mesh(new THREE.BoxGeometry(0.35, 5.6, 0.35).translate(x, FLOOR + 2.8, ZF - 0.3), dark));
+    g.add(new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.35, D).translate(x, FLOOR + 5.6, 10 + D / 2), dark));
+  }
+  g.add(new THREE.Mesh(new THREE.BoxGeometry(30, 0.35, 0.35).translate(0, FLOOR + 5.6, ZF - 0.3), dark));
+  const rail = m('#6b4a2f');
+  g.add(new THREE.Mesh(new THREE.BoxGeometry(30, 0.2, 0.2).translate(0, FLOOR + 1.9, ZF - 0.2), rail));
+  // round café tables with maroon chairs
+  const chair = m('#6d2b2b'), steelLeg = m('#e8e8e4');
+  for (const [x, z] of [[-5, 12.3], [0, 12.3], [5, 12.3], [-2.5, 15], [2.5, 15]]) {
+    g.add(new THREE.Mesh(new THREE.CylinderGeometry(1.15, 1.15, 0.12, 12).translate(x, FLOOR + 1.6, z), dark));
+    g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 1.6, 6).translate(x, FLOOR + 0.8, z), steelLeg));
+    for (let a = 0; a < 4; a++) {
+      const cx = x + Math.cos(a * Math.PI / 2) * 1.7, cz = z + Math.sin(a * Math.PI / 2) * 1.7;
+      g.add(new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.12, 0.8).translate(cx, FLOOR + 1, cz), chair));
+      g.add(new THREE.Mesh(new THREE.BoxGeometry(0.1, 1, 0.1).translate(cx, FLOOR + 0.5, cz), steelLeg));
+    }
+  }
+  // wooden bench tables at the front
+  for (const x of [-10.5, 10]) {
+    g.add(new THREE.Mesh(new THREE.BoxGeometry(4, 0.2, 1.6).translate(x, FLOOR + 1.6, ZF - 2.6), dark));
+    for (const dz of [-1.5, 1.5]) g.add(new THREE.Mesh(new THREE.BoxGeometry(4, 0.2, 0.6).translate(x, FLOOR + 0.9, ZF - 2.6 + dz), dark));
+    for (const dx of [-1.6, 1.6]) g.add(new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.6, 0.2).translate(x + dx, FLOOR + 0.8, ZF - 2.6), dark));
+  }
+  // tea tasting counter + sign, and tea-region banners on the back wall
+  g.add(new THREE.Mesh(new THREE.BoxGeometry(5, 2, 1.4).translate(-12.2, FLOOR + 1, 11.4), m('#c8894a')));
+  const wallSign = (w, h, x, y, draw) => {
+    const s = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: boardTexture(Math.round(w * 64), Math.round(h * 64), draw) }));
+    s.position.set(x, y, 10.12); g.add(s);
+  };
+  wallSign(6, 0.9, -11, FLOOR + 3.9, (ctx, w, h) => {
+    ctx.fillStyle = '#f8f5ee'; ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#8b1e1e'; fitText(ctx, 'TEA TASTING UNIT', w / 2, h / 2, w - 20, 44, 800, 'center');
+  });
+  ['Uva', 'Kandy', 'Dimbula', 'Ruhuna', 'Nuwara Eliya'].forEach((name, k) => wallSign(1.8, 3.2, -3 + k * 3.6, FLOOR + 2.4, (ctx, w, h) => {
+    ctx.fillStyle = '#f2ede2'; ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#2b2b2b'; fitText(ctx, name, w / 2, 26, w - 12, 20, 700, 'center');
+    ctx.fillStyle = '#4a4a4a'; for (let r = 0; r < 6; r++) ctx.fillRect(12, 50 + r * 12, w - 24, 4);
+    ctx.fillStyle = '#d9481c'; ctx.beginPath(); ctx.arc(w / 2, h - 52, 22, 0, Math.PI * 2); ctx.fill();
+  }));
+  // tea shop sign on the railing
+  const shop = new THREE.Mesh(new THREE.PlaneGeometry(8, 1.3), new THREE.MeshBasicMaterial({ map: boardTexture(1024, 166, (ctx, w, h) => {
+    ctx.fillStyle = '#3f7d3a'; ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#fff8e6'; fitText(ctx, 'Tea Shop · Restaurant · Top floor', w / 2, h / 2, w - 60, 86, 700, 'center');
+  }) }));
+  shop.position.set(-3, FLOOR + 1.1, ZF - 0.05); g.add(shop);
+  // coin-operated viewing telescope at the corner
+  const steel = m('#5b6670'), scope = new THREE.Group();
+  scope.add(new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.45, 3, 8).translate(0, 1.5, 0), steel));
+  scope.add(new THREE.Mesh(new THREE.BoxGeometry(1, 0.9, 1).translate(0, 3.3, 0), steel));
+  scope.add(new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.42, 3.2, 10).rotateX(Math.PI / 2 - 0.15).translate(0, 3.55, 0.9), m('#2f3a42')));
+  scope.position.set(14.2, FLOOR, ZF - 1.4); g.add(scope);
+  const guest = (spec, x, y, z, ry, anim = 'idle') => {
+    const P = buildPerson(spec); P.root.position.set(x, y, z); P.root.rotation.y = ry; g.add(P.root); npcs.push({ P, anim });
+  };
+  guest(touristSpec(rnd), 14.2, FLOOR, ZF - 3.4, 0, 'scope'); // looking through the telescope
+  for (const [x, z, ry] of [[-12, 12.9, 3.1], [-10, 16.2, 2.9], [-5, 13.9, 2.8], [0, 13.9, -0.5], [5, 13.9, 3.3], [-2.5, 16.5, 0.2], [10, 16.3, 3.1], [7.5, 11.3, 0.9]])
+    guest(touristSpec(rnd), x, FLOOR, z, ry);
+  // more visitors arriving at the entrance, and their tour van
+  for (const [x, z, ry] of [[-9, 21, 3.1], [-6.5, 22, 2.6], [-2, 21.5, -2.8], [1, 23, 3.4], [4, 21, 2.9]]) guest(touristSpec(rnd), x, 0.6, z, ry);
+  const van = new THREE.Group();
+  van.add(new THREE.Mesh(new THREE.BoxGeometry(10, 3.4, 3.8).translate(0, 2.3, 0), m('#f4f4f0')));
+  van.add(new THREE.Mesh(new THREE.BoxGeometry(8.4, 1, 3.9).translate(-0.4, 3, 0), m('#2f3a42')));
+  for (const [wx, wz] of [[-3.4, 1.9], [3.4, 1.9], [-3.4, -1.9], [3.4, -1.9]])
+    van.add(new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 0.5, 10).rotateX(Math.PI / 2).translate(wx, 0.7, wz), m('#1f2328')));
+  van.position.set(14, 0.6, 24); van.rotation.y = 0.3; g.add(van);
+}
+// visitors from abroad: bright hiking clothes, backpacks, sun hats
+function touristSpec(rnd) {
+  const pick = (a) => a[Math.floor(rnd() * a.length)];
+  return {
+    shirt: pick(['#f97316', '#0ea5e9', '#e11d48', '#facc15', '#14b8a6', '#a855f7', '#f8fafc']),
+    pants: pick(['#c8b48a', '#6b7280', '#334155', '#a3a380']), skin: pick(['#f1d3bd', '#e8c1a0', '#f5dcc8', '#dcb08e']),
+    hair: pick(['#e3c16f', '#a0662f', '#5a3a22', '#c0502a', '#d9c79a']), pack: pick(['#1d4ed8', '#dc2626', '#16a34a', '#f59e0b', '#475569']),
+    hat: pick([null, 'cap', 'bucket']), hatColor: pick(['#f5f5f4', '#d6c7a1', '#1f2937', '#0f766e']),
+    beard: rnd() < 0.25, glasses: rnd() < 0.3, scale: 0.98 + rnd() * 0.1,
+  };
+}
+
+// ---------- trail waymarks: painted arrows on trees and rocks, fingerposts at key junctions ----------
+const JUNCTIONS = ['kandy-view', 'shooting-club', 'meditation-stupa', 'katusu-konda', 'film-site', 'pine-forest', 'galaha-town'];
+function arrowShape() {
+  const s = new THREE.Shape();
+  s.moveTo(-0.5, -0.12); s.lineTo(0.12, -0.12); s.lineTo(0.12, -0.3); s.lineTo(0.5, 0);
+  s.lineTo(0.12, 0.3); s.lineTo(0.12, 0.12); s.lineTo(-0.5, 0.12); s.closePath();
+  return new THREE.ShapeGeometry(s);
+}
+function buildWaymarks() {
+  const rnd = mulberry32(31), arrowGeo = arrowShape(), patchGeo = new THREE.PlaneGeometry(1.25, 1.25);
+  const paint = new THREE.MeshBasicMaterial({ color: '#f8f5ea' }), green = new THREE.MeshBasicMaterial({ color: '#2f7a34' });
+  const bark = lambert({ color: '#6b5038' }), leaf = lambert({ color: '#5f9443' }), stone = lambert({ color: '#8d8d82' });
+  const posts = JUNCTIONS.map((id) => landmarks.find((l) => l.id === id)).filter(Boolean).map((L) => L.s + 18);
+  // painted mark facing the trail; the arrow points the way to Galaha
+  const mark = (g, y, z) => {
+    const patch = new THREE.Mesh(patchGeo, paint); patch.position.set(0, y, z);
+    const arrow = new THREE.Mesh(arrowGeo, green); arrow.position.set(0, y, z + 0.02);
+    g.add(patch, arrow); return arrow;
+  };
+  let n = 0;
+  for (let s = 120; s < trail.len - 60; s += 200) {
+    if (posts.some((p) => Math.abs(p - s) < 40) || landmarks.some((l) => Math.abs(l.s - s) < 25)) continue;
+    const p = posAt(s, new THREE.Vector3()), t = tangentAt(s, 3), sg = rnd() < 0.5 ? 1 : -1, g = new THREE.Group();
+    let arrow;
+    if (n++ % 2 === 0) { // tree with a painted trunk
+      g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.55, 9, 7).translate(0, 4.5, 0), bark));
+      g.add(new THREE.Mesh(new THREE.IcosahedronGeometry(2.8, 0).scale(1, 0.75, 1).translate(0, 9.5, 0), leaf));
+      arrow = mark(g, 2.6, 0.5);
+    } else { // boulder with a painted face
+      g.add(new THREE.Mesh(new THREE.DodecahedronGeometry(1.5, 0).scale(1.3, 0.85, 1).translate(0, 1.1, 0), stone));
+      arrow = mark(g, 1.3, 1.32);
+    }
+    const x = p.x - t.z * 3.6 * sg, z = p.z + t.x * 3.6 * sg, f = posAt(Math.max(0, s - 12), new THREE.Vector3());
+    placeAt(g, x, z, f.x, f.z); // painted face turned toward hikers coming up the trail
+    // arrow as the hiker sees it: up = straight on, otherwise the way the trail turns in the next 60 m
+    const t2 = tangentAt(s + 60, 3), turn = t.x * t2.z - t.z * t2.x;
+    arrow.rotation.z = Math.abs(turn) < 0.35 ? Math.PI / 2 : turn > 0 ? 0 : Math.PI;
+  }
+  // fingerposts: one blade to Galaha, one back to Hanthana
+  const blade = (label, tipRight) => boardTexture(512, 96, (ctx, w, h) => {
+    ctx.fillStyle = '#2f6b33'; ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#fff8e6'; fitText(ctx, tipRight ? `${label}  ▶` : `◀  ${label}`, w / 2, h / 2, w - 30, 52, 700, 'center');
+  });
+  const wood = lambert({ color: '#6b4a2f' }), totalKm = gpxLen / 1000;
+  for (const id of JUNCTIONS) {
+    const L = landmarks.find((l) => l.id === id); if (!L) continue;
+    const s = L.s + 18, p = posAt(s, new THREE.Vector3()), t = tangentAt(s, 3), sg = L.side === 'right' ? -1 : 1, g = new THREE.Group();
+    g.add(new THREE.Mesh(new THREE.BoxGeometry(0.35, 6, 0.35).translate(0, 3, 0), wood));
+    const fwd = `Galaha ${(totalKm - L.km).toFixed(1)} km`, back = `Hanthana ${L.km.toFixed(1)} km`;
+    for (const [dir, y, label] of [[1, 5, fwd], [-1, 4.1, back]]) {
+      g.add(new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.8, 0.12).translate(dir * 2.2, y, 0), wood));
+      const front = new THREE.Mesh(new THREE.PlaneGeometry(4.1, 0.72), new THREE.MeshBasicMaterial({ map: blade(label, dir > 0) }));
+      front.position.set(dir * 2.2, y, 0.07);
+      const rear = new THREE.Mesh(new THREE.PlaneGeometry(4.1, 0.72), new THREE.MeshBasicMaterial({ map: blade(label, dir < 0) }));
+      rear.position.set(dir * 2.2, y, -0.07); rear.rotation.y = Math.PI;
+      g.add(front, rear);
+    }
+    if (IMG.logo) {
+      const logoMat = new THREE.MeshBasicMaterial({ map: boardTexture(256, 256, (ctx) => ctx.drawImage(IMG.logo, 0, 0, 256, 256)) });
+      for (const r of [0, Math.PI]) { const q = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 1.1), logoMat); q.position.set(0, 6.3, r ? -0.19 : 0.19); q.rotation.y = r; g.add(q); }
+    }
+    placeAt(g, p.x - t.z * 4 * sg, p.z + t.x * 4 * sg);
+    // blades along the trail (Galaha blade pointing ahead), turned ~40° so the side facing the path is readable on approach
+    const th0 = Math.atan2(-t.z, t.x), tx = t.z * sg, tz = -t.x * sg;
+    for (const dl of [0.7, -0.7]) {
+      const zx = Math.sin(th0 + dl), zz = Math.cos(th0 + dl), f = zx * tx + zz * tz > 0 ? 1 : -1;
+      if ((zx * t.x + zz * t.z) * f < 0) { g.rotation.y = th0 + dl; break; }
+    }
+  }
+}
+
+// ---------- signboards (start nameboard, stage map banner, finish board) ----------
+const IMG = { logo: null, map: null };
+function boardTexture(w, h, draw) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  draw(c.getContext('2d'), w, h);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  return tex;
+}
+// draw text shrunk to fit maxW
+function fitText(ctx, text, x, y, maxW, size, weight = 700, align = 'left') {
+  ctx.font = `${weight} ${size}px system-ui, sans-serif`;
+  const fs = Math.min(size, size * maxW / ctx.measureText(text).width);
+  ctx.font = `${weight} ${fs}px system-ui, sans-serif`; ctx.textAlign = align; ctx.textBaseline = 'middle';
+  ctx.fillText(text, x, y);
+}
+function logoBoard(title, sub) {
+  return boardTexture(1280, 360, (ctx, w, h) => {
+    ctx.fillStyle = '#f6f0de'; ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = '#3f7d3a'; ctx.lineWidth = 16; ctx.strokeRect(8, 8, w - 16, h - 16);
+    if (IMG.logo) ctx.drawImage(IMG.logo, 28, 28, h - 56, h - 56);
+    ctx.fillStyle = '#1f2a22'; fitText(ctx, title, h + 10, h * 0.42, w - h - 50, 96);
+    ctx.fillStyle = '#5b6b5e'; fitText(ctx, sub, h + 10, h * 0.74, w - h - 50, 44, 500);
+  });
+}
+// wooden board on two posts; the picture faces local +z
+function buildBoard(tex, w, h, postH) {
+  const g = new THREE.Group(), wood = lambert({ color: '#6b4a2f' });
+  g.add(new THREE.Mesh(new THREE.BoxGeometry(w + 0.5, h + 0.5, 0.3).translate(0, postH + h / 2, 0), wood));
+  const face = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex }));
+  face.position.set(0, postH + h / 2, 0.16); g.add(face);
+  for (const sx of [-w / 2 + 0.3, w / 2 - 0.3]) g.add(new THREE.Mesh(new THREE.BoxGeometry(0.4, postH + h + 0.4, 0.4).translate(sx, (postH + h + 0.4) / 2, -0.1), wood));
+  return g;
+}
+// stand a board beside the trail at s, facing hikers coming from `faceBack` metres earlier
+function placeBoard(g, s, dist, side, faceBack = 35) {
+  const p = posAt(s, new THREE.Vector3()), t = tangentAt(s, 3), sg = side === 'right' ? 1 : -1;
+  const x = p.x - t.z * dist * sg, z = p.z + t.x * dist * sg, f = posAt(Math.max(0, s - faceBack), new THREE.Vector3());
+  placeAt(g, x, z, f.x, f.z);
+}
+function buildSigns() {
+  placeBoard(buildBoard(logoBoard('Ceylon Tea Museum', 'The Pekoe Trail · Stage 1 start · Hanthana'), 10, 2.8, 2.6), START_S + 22, 7, 'left');
+  // official stage map as a banner at the trailhead
+  const mapTex = boardTexture(1024, 1200, (ctx, w, h) => {
+    ctx.fillStyle = '#f6f0de'; ctx.fillRect(0, 0, w, h);
+    if (IMG.logo) ctx.drawImage(IMG.logo, 24, 14, 104, 104);
+    ctx.fillStyle = '#1f2a22'; fitText(ctx, 'Stage 1 · Hanthana → Galaha', 146, 52, w - 170, 58);
+    ctx.fillStyle = '#5b6b5e'; fitText(ctx, '12.8 km · Ceylon Tea Museum to Galaha Post Office', 146, 98, w - 170, 30, 500);
+    if (IMG.map) {
+      const top = 134, mh = h - top - 20, mw = Math.min(w - 40, mh * IMG.map.width / IMG.map.height), ph = mw * IMG.map.height / IMG.map.width;
+      ctx.drawImage(IMG.map, (w - mw) / 2, top, mw, ph);
+    }
+  });
+  placeBoard(buildBoard(mapTex, 7, 7 * 1200 / 1024, 1.4), START_S + 40, 8, 'right');
+  placeBoard(buildBoard(logoBoard('Galaha', 'End of Pekoe Trail Stage 1 · 12.8 km'), 10, 2.8, 2.6), trail.len - 35, 7, 'left');
+}
+
+// framed photo on a stand beside each landmark (own .jpg photos first); click it to open the card
+function buildPhotoBoards() {
+  for (const L of landmarks) {
+    const photos = L.photos ?? []; if (!photos.length) continue;
+    const src = photos.find((p) => /\.jpe?g$/i.test(p)) ?? photos[0];
+    const s = Math.max(0, L.s - 14), p = posAt(s, new THREE.Vector3()), t = tangentAt(s, 3), sg = L.side === 'right' ? -1 : 1;
+    const x = p.x - t.z * 6.5 * sg, z = p.z + t.x * 6.5 * sg, f = posAt(Math.max(0, s - 20), new THREE.Vector3());
+    const tex = new THREE.Texture(); tex.colorSpace = THREE.SRGBColorSpace;
+    const g = buildBoard(tex, 5, 3.6, 1.6), face = g.children[1];
+    face.material.color.set('#cfe0d0'); face.material.map = null;
+    placeAt(g, x, z, f.x, f.z);
+    g.userData.L = L;
+    L.photoBoard = g;
+    // downscale to 512 px so ~25 photos stay light on GPU memory
+    loadImage(src).then((img) => {
+      const k = 512 / Math.max(img.width, img.height), c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      tex.image = c; tex.needsUpdate = true;
+      face.material.map = tex; face.material.color.set('#ffffff'); face.material.needsUpdate = true;
+      const a = c.width / c.height; // fit the frame to the photo
+      face.scale.set(Math.min(1, a * 3.6 / 5), Math.min(1, 5 / a / 3.6), 1);
+    }).catch(() => console.warn('photo board failed:', src));
+  }
+}
+
+
+// landmark markers: post + glowing orb + soft beam
+const markerMats = { todo: new THREE.MeshBasicMaterial({ color: '#ffc94d' }), done: new THREE.MeshBasicMaterial({ color: '#9fe08a' }) };
+const beamMat = new THREE.MeshBasicMaterial({ color: '#ffd977', transparent: true, opacity: 0.22, depthWrite: false, blending: THREE.AdditiveBlending });
+function buildMarkers() {
+  const post = new THREE.CylinderGeometry(0.22, 0.28, 6, 6).translate(0, 3, 0), orb = new THREE.IcosahedronGeometry(1.1, 1),
+    beam = new THREE.CylinderGeometry(0.7, 0.7, 120, 8, 1, true).translate(0, 60, 0);
+  for (const L of landmarks) {
+    // marker on the right of the walking direction, unless the place itself is on the right
+    const s = L.s, p = posAt(s, new THREE.Vector3()), t = tangentAt(s, 2), sg = L.side === 'right' ? -1 : 1;
+    const x = p.x - t.z * 7 * sg, z = p.z + t.x * 7 * sg, y = heightAt(x, z);
+    const g = new THREE.Group(); g.position.set(x, y, z); g.userData.L = L;
+    const postM = new THREE.Mesh(post, lambert({ color: '#7b5a3a' })); postM.castShadow = true;
+    const orbM = new THREE.Mesh(orb, markerMats.todo); orbM.position.y = 7.3;
+    const beamM = new THREE.Mesh(beam, beamMat.clone());
+    g.add(postM, orbM, beamM);
+    scene.add(g);
+    L.marker = { g, orbM, beamM };
+  }
+}
+
+// ---------- people (low-poly figures; team outfits taken from photos/team.jpeg) ----------
+// walking order on the trail, front to back
+const TEAM = [
+  { name: 'Sudesh', shirt: '#1d2846', collar: '#2a3760', pants: '#2b2f36', hair: '#151210', beard: true, pack: '#2a2d33', scale: 0.93, skin: '#8d5a3b' },
+  { name: 'Dinusha', shirt: '#9fc4a8', hat: 'cap', hatColor: '#8b8e90', pants: '#3a3f47', beard: true, pack: '#3a3d42', skin: '#93603f' },
+  { name: 'Sithara', shirt: '#18191b', hat: 'bucket', hatColor: '#141516', glasses: true, beard: true, pants: '#23262b', pack: '#2d3035', scale: 1.02, skin: '#8a573a' },
+  { name: 'Theshawa', shirt: '#202329', hood: true, logo: true, hair: '#141110', beard: true, pants: '#2c2f34', pack: '#2c2f34', skin: '#87553a' },
+  { name: 'Adithya', shirt: '#5f6b4d', hat: 'bucket', hatColor: '#151617', beard: true, pants: '#3b3f45', pack: '#4b5057', scale: 1.05, skin: '#8f5c3c' },
+];
+const SPACING = 7;   // metres between hikers along the trail
+const START_S = (TEAM.length - 1) * SPACING; // leader starts ahead so the whole line is on the trail
+const CAM_FOLLOW = TEAM.length - 1; // camera rides behind the last hiker...
+const CAM_LOOK = 2;                 // ...and looks at the middle of the line
+
+
+function buildPerson(o) {
+  const m = (hex) => lambert({ color: hex });
+  const skin = m(o.skin ?? '#8f5c3c'), shirt = m(o.shirt), pants = m(o.pants ?? '#3a3f47'), boot = m(o.shoes ?? '#2b2420');
+  const hair = m(o.hair ?? '#151210');
+  const root = new THREE.Group(), body = new THREE.Group(); root.add(body);
+  const box = (w, h, d, mat) => new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+  const limb = (x, y, parts) => { const g = new THREE.Group(); g.position.set(x, y, 0); parts.forEach((p) => g.add(p)); body.add(g); return g; };
+  const leg = (x) => limb(x, 0.86, [box(0.22, 0.72, 0.26, pants).translateY(-0.36), box(0.24, 0.16, 0.34, boot).translateY(-0.78).translateZ(0.04)]);
+  const legL = leg(-0.14), legR = leg(0.14);
+  if (o.skirt) body.add(new THREE.Mesh(new THREE.ConeGeometry(0.42, 0.95, 8).translate(0, 0.5, 0), m(o.skirt)));
+  body.add(box(0.56, 0.66, 0.32, shirt).translateY(1.2));
+  if (o.collar) body.add(box(0.36, 0.07, 0.06, m(o.collar)).translateY(1.5).translateZ(0.14));
+  if (o.logo) body.add(box(0.3, 0.04, 0.01, m('#e8ece9')).translateY(1.32).translateZ(0.165));
+  if (o.hood) body.add(box(0.42, 0.18, 0.16, shirt).translateY(1.56).translateZ(-0.19));
+  if (o.pack) {
+    body.add(box(0.46, 0.58, 0.26, m(o.pack)).translateY(1.25).translateZ(-0.29));
+    body.add(box(0.06, 0.5, 0.04, m('#9aa0a6')).translateY(1.3).translateZ(0.17).translateX(-0.18));
+    body.add(box(0.06, 0.5, 0.04, m('#9aa0a6')).translateY(1.3).translateZ(0.17).translateX(0.18));
+  }
+  if (o.basket) body.add(new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.2, 0.7, 8).translate(0, 1.3, -0.36), m('#9a7448')));
+  const arm = (x) => limb(x, 1.48, [box(0.16, 0.3, 0.18, shirt).translateY(-0.15), box(0.14, 0.34, 0.16, skin).translateY(-0.46)]);
+  const armL = arm(-0.36), armR = arm(0.36);
+  if (o.bouquet) {
+    armR.add(new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.3, 6).rotateX(Math.PI).translate(0, -0.72, 0.05), m('#3f7d3a')));
+    ['#f43f5e', '#facc15', '#f8fafc', '#fb923c', '#c084fc'].forEach((c, k) => {
+      const a = k / 5 * Math.PI * 2, f = new THREE.Mesh(new THREE.IcosahedronGeometry(0.07, 0), m(c));
+      f.position.set(Math.cos(a) * 0.08, -0.9, 0.05 + Math.sin(a) * 0.08); armR.add(f);
+    });
+  }
+  const head = new THREE.Mesh(new THREE.IcosahedronGeometry(0.2, 1), skin); head.position.y = 1.76; body.add(head);
+  if (!o.hat || o.hat === 'cap') body.add(new THREE.Mesh(new THREE.SphereGeometry(0.205, 10, 5, 0, Math.PI * 2, 0, Math.PI / 2.2), hair).translateY(1.79));
+  if (o.beard) body.add(box(0.3, 0.12, 0.08, hair).translateY(1.64).translateZ(0.13));
+  if (o.glasses) body.add(box(0.34, 0.07, 0.04, m('#0d0d0f')).translateY(1.79).translateZ(0.19));
+  if (o.hat === 'bucket') {
+    const hm = m(o.hatColor ?? '#151617');
+    body.add(new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.38, 0.09, 12), hm).translateY(1.9));
+    body.add(new THREE.Mesh(new THREE.CylinderGeometry(0.21, 0.24, 0.2, 12), hm).translateY(2.0));
+  } else if (o.hat === 'cap' || o.hat === 'scarf') {
+    const hm = m(o.hatColor ?? '#8b8e90');
+    body.add(new THREE.Mesh(new THREE.SphereGeometry(0.215, 10, 5, 0, Math.PI * 2, 0, Math.PI / 2), hm).translateY(1.8));
+    if (o.hat === 'cap') body.add(box(0.3, 0.03, 0.2, hm).translateY(1.81).translateZ(0.24));
+  }
+  const s = 2.2 * (o.scale ?? 1);
+  root.scale.setScalar(s);
+  root.traverse((c) => { if (c.isMesh) c.castShadow = true; });
+  scene.add(root);
+  return { root, body, legL, legR, armL, armR, phase: Math.random() * 6, o };
+}
+
+// walk cycle; moving = 0..1
+function animateWalk(P, dt, moving, rate) {
+  P.phase += dt * rate * (moving > 0.05 ? 1 : 0);
+  const sw = Math.sin(P.phase) * 0.7 * moving;
+  P.legL.rotation.x = sw; P.legR.rotation.x = -sw; P.armL.rotation.x = -sw * 0.8; P.armR.rotation.x = sw * 0.8;
+  P.armL.rotation.z = 0; P.armR.rotation.z = 0;
+  P.body.position.y = Math.abs(Math.cos(P.phase)) * 0.06 * moving;
+  P.body.rotation.x = 0.08 * moving;
+}
+function animateWave(P, time, both) {
+  P.legL.rotation.x = P.legR.rotation.x = 0; P.body.rotation.x = 0;
+  P.armR.rotation.x = 0; P.armR.rotation.z = 2.6 + Math.sin(time * 9 + P.phase) * 0.35;
+  P.armL.rotation.z = both ? -2.6 - Math.sin(time * 9 + P.phase + 1) * 0.35 : 0;
+  P.body.position.y = both ? Math.abs(Math.sin(time * 5 + P.phase)) * 0.12 : 0;
+}
+
+// light rain between 7 and 8 km: Dinusha had an umbrella, Sudesh a raincoat, the others nothing
+const RAIN_KM = [7, 8];
+let rainGear = null, rain = null, rainNotified = false;
+function addRainGear() {
+  const m = (c) => lambert({ color: c });
+  const dinusha = team.find((P) => P.o.name === 'Dinusha'), sudesh = team.find((P) => P.o.name === 'Sudesh');
+  const umbrella = new THREE.Group();
+  umbrella.add(new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 1.5, 5).translate(0, 0.75, 0), m('#2b2b2b')));
+  umbrella.add(new THREE.Mesh(new THREE.ConeGeometry(0.95, 0.38, 8, 1, true).translate(0, 1.62, 0),
+    new THREE.MeshLambertMaterial({ color: '#1f2937', flatShading: true, side: THREE.DoubleSide })));
+  umbrella.position.set(0.36, 1.2, 0.5);
+  dinusha.body.add(umbrella);
+  const coat = new THREE.Group(), cm = m('#1e40af');
+  coat.add(new THREE.Mesh(new THREE.BoxGeometry(0.66, 0.74, 0.78).translate(0, 1.2, -0.15), cm)); // over the backpack too
+  coat.add(new THREE.Mesh(new THREE.ConeGeometry(0.46, 0.55, 8).translate(0, 0.72, -0.08), cm));
+  coat.add(new THREE.Mesh(new THREE.SphereGeometry(0.235, 8, 6, 0, Math.PI * 2, 0, Math.PI / 1.8).translate(0, 1.78, -0.02), cm));
+  sudesh.body.add(coat);
+  for (const g of [umbrella, coat]) { g.visible = false; g.traverse((o) => { if (o.isMesh) o.castShadow = true; }); }
+  rainGear = { umbrella, coat, dinusha };
+}
+function buildRain() {
+  const N = isTouch ? 700 : 1500, rnd = mulberry32(5), pos = new Float32Array(N * 6);
+  for (let i = 0; i < N; i++) {
+    const x = (rnd() - 0.5) * 80, y = rnd() * 40, z = (rnd() - 0.5) * 80;
+    pos.set([x, y, z, x + 0.12, y - 0.9, z], i * 6);
+  }
+  const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  rain = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ color: '#c9d6e2', transparent: true, opacity: 0, depthWrite: false }));
+  rain.frustumCulled = false; rain.visible = false;
+  scene.add(rain);
+}
+const RAIN_FOG = new THREE.Color('#b4bcba');
+// 0..1 rain strength at the leader's km, easing in and out over ~100 m
+function rainAt(km) { return clamp(Math.min(km - RAIN_KM[0], RAIN_KM[1] - km) / 0.1 + 0.5, 0, 1); }
+function updateRain(dt, centre) {
+  const r = rainAt(sToKm(walker.s));
+  hemi.intensity = 1.25 * (1 - 0.25 * r); sun.intensity = 2.6 * (1 - 0.45 * r);
+  scene.fog.color.copy(FOG).lerp(RAIN_FOG, r); scene.fog.far = lerp(5200, 1600, r);
+  rainGear.umbrella.visible = rainGear.coat.visible = r > 0.05;
+  rain.visible = r > 0.01; if (!rain.visible) return;
+  rain.material.opacity = 0.45 * r;
+  rain.position.set(centre.x, centre.y - 6, centre.z);
+  const a = rain.geometry.attributes.position, v = a.array;
+  for (let i = 0; i < v.length; i += 6) {
+    let y = v[i + 1] - 20 * dt; if (y < 0) y += 40;
+    v[i + 1] = y; v[i + 4] = y - 0.9;
+  }
+  a.needsUpdate = true;
+  if (!rainNotified && r > 0.5 && started) {
+    rainNotified = true;
+    const hint = $('hint'); hint.textContent = 'Light rain between 7 and 8 km · umbrella up for Dinusha, raincoat on for Sudesh';
+    hint.classList.remove('hidden'); hint.style.opacity = 1; setTimeout(() => { hint.style.opacity = 0; }, 5000);
+  }
+}
+
+// people met along the trail + story set pieces, driven by landmark `event`
+const npcs = [];
+let bathSpot = null;
+function buildStoryScenes() {
+  const rnd = mulberry32(77);
+  // point beside the trail on the landmark's side (walking direction); default = left, opposite the marker
+  const side = (L, dist, along = 0) => {
+    const p = posAt(L.s + along, new THREE.Vector3()), t = tangentAt(L.s + along, 2);
+    const sg = L.side === 'right' ? 1 : -1, x = p.x - t.z * dist * sg, z = p.z + t.x * dist * sg;
+    return { x, z, y: heightAt(x, z), fx: p.x, fz: p.z };
+  };
+  const addNPC = (spec, at, anim) => {
+    const P = buildPerson({ label: false, ...spec });
+    P.root.position.set(at.x, at.y - 0.2, at.z);
+    P.root.rotation.y = Math.atan2(at.fx - at.x, at.fz - at.z) + (rnd() - 0.5) * 0.6;
+    npcs.push({ P, anim });
+  };
+  const SARI = ['#c2410c', '#7c3aed', '#be185d', '#0f766e', '#b45309'];
+  const KID = ['#ef4444', '#f59e0b', '#3b82f6', '#22c55e', '#ec4899'];
+  for (const L of landmarks) {
+    if (L.event === 'locals') {
+      addNPC({ shirt: '#e5e7eb', skirt: '#2563eb', pants: '#2563eb', skin: '#7a4a30' }, side(L, 9, -6), 'idle');
+      addNPC({ shirt: '#f1e3c8', skirt: '#57534e', pants: '#57534e', skin: '#80513a', hair: '#d6d3d1' }, side(L, 10, 4), 'idle');
+    } else if (L.event === 'pluckers') {
+      for (let k = 0; k < 5; k++) {
+        const c = SARI[k % SARI.length];
+        addNPC({ shirt: c, skirt: c, pants: c, hat: 'scarf', hatColor: '#f5f5f4', basket: true, skin: '#7b4a2f' },
+          side(L, 16 + rnd() * 30, (rnd() - 0.5) * 80), 'pluck');
+      }
+    } else if (L.event === 'kovil') {
+      // small roadside shrine: painted base, little stepped tower, water tap; 5 kids got chocolates here
+      const at = side(L, 13), g = new THREE.Group();
+      g.add(new THREE.Mesh(new THREE.BoxGeometry(3.6, 2.6, 3.2).translate(0, 1.3, 0), lambert({ color: '#f3e8c8' })));
+      g.add(new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.8, 0.2).translate(0, 0.9, 1.62), lambert({ color: '#7a2e22' })));
+      ['#e8b04a', '#d9534f', '#4a90c2', '#5fae5a'].forEach((c, k) =>
+        g.add(new THREE.Mesh(new THREE.BoxGeometry(2.6 - k * 0.55, 0.7, 2.3 - k * 0.5).translate(0, 2.95 + k * 0.7, 0), lambert({ color: c }))));
+      g.add(new THREE.Mesh(new THREE.ConeGeometry(0.28, 0.7, 6).translate(0, 5.6, 0), lambert({ color: '#e3b341' })));
+      g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 1.1, 6).translate(3, 0.55, 1.6), lambert({ color: '#9ca3af' })));
+      g.add(new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.1, 0.12).translate(3, 1.1, 1.82), lambert({ color: '#9ca3af' })));
+      placeAt(g, at.x, at.z, at.fx, at.fz);
+      for (let k = 0; k < 5; k++) {
+        addNPC({ shirt: KID[k % KID.length], pants: '#1e3a8a', scale: 0.52 + rnd() * 0.1, skin: '#7f4f33' }, side(L, 6.5 + (k % 2) * 2, -7 + k * 3.5), 'wave');
+      }
+    } else if (L.event === 'flowers') {
+      // 2 kids handing over a bouquet in return for chocolates
+      for (let k = 0; k < 2; k++) {
+        addNPC({ shirt: KID[(k + 2) % KID.length], pants: '#7c2d12', scale: 0.55, skin: '#7f4f33', bouquet: k === 0 }, side(L, 6, -2 + k * 3), 'offer');
+      }
+    } else if (L.event === 'bath') {
+      // stream crossing the road; the pool Adithya bathed in is on the right
+      const p0 = posAt(L.s, new THREE.Vector3()), t0 = tangentAt(L.s, 3), sg = L.side === 'right' ? 1 : -1;
+      const spos = [], sidx = [];
+      for (let k = 0, u = -60; u <= 60; u += 4, k++) {
+        const cx = p0.x - t0.z * u * sg, cz = p0.z + t0.x * u * sg;
+        for (const e of [-1, 1]) { const x = cx + t0.x * 1.6 * e, z = cz + t0.z * 1.6 * e; spos.push(x, heightAt(x, z) + 0.55, z); }
+        if (k) { const a = (k - 1) * 2; sidx.push(a, a + 2, a + 1, a + 1, a + 2, a + 3); }
+      }
+      const sg2 = new THREE.BufferGeometry(); sg2.setAttribute('position', new THREE.Float32BufferAttribute(spos, 3)); sg2.setIndex(sidx); sg2.computeVertexNormals();
+      scene.add(new THREE.Mesh(sg2, new THREE.MeshLambertMaterial({ color: '#5aa7c6', side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 })));
+      const at = side(L, 14);
+      const pool = new THREE.Mesh(new THREE.CircleGeometry(6, 12).rotateX(-Math.PI / 2), new THREE.MeshLambertMaterial({ color: '#5aa7c6', transparent: true, opacity: 0.85 }));
+      pool.position.set(at.x, at.y + 0.5, at.z); scene.add(pool);
+      for (let k = 0; k < 9; k++) {
+        const a = k / 9 * Math.PI * 2, r = new THREE.Mesh(new THREE.DodecahedronGeometry(1 + rnd() * 0.8, 0), lambert({ color: '#8d8d82' }));
+        r.position.set(at.x + Math.cos(a) * 6.4, at.y + 0.3, at.z + Math.sin(a) * 6.4); r.castShadow = true; scene.add(r);
+      }
+      bathSpot = { x: at.x, y: at.y + 0.5, z: at.z, L };
+    }
+  }
+  // women plucking tea in the estate sections, away from the story stops
+  for (let s = 250; s < trail.len; s += 420) {
+    const zone = zoneAtKm(sToKm(s));
+    if ((zone !== 'tea' && zone !== 'teaforest') || landmarks.some((l) => Math.abs(l.s - s) < 90)) continue;
+    const spot = { s, side: rnd() < 0.5 ? 'right' : 'left' }, n = 2 + Math.floor(rnd() * 3);
+    for (let k = 0; k < n; k++) {
+      const c = SARI[Math.floor(rnd() * SARI.length)];
+      addNPC({ shirt: c, skirt: c, pants: c, hat: 'scarf', hatColor: '#f5f5f4', basket: true, skin: '#7b4a2f' },
+        side(spot, 12 + rnd() * 26, (rnd() - 0.5) * 50), 'pluck');
+    }
+  }
+}
+
+// foreign hikers walking the stage the other way; they step aside and wave as the team passes
+const TOURIST_KM = [1.75, 3.3, 4.7, 6.95, 9.3, 11.1];
+const tourists = [];
+function buildTourists() {
+  const rnd = mulberry32(2024);
+  for (const km of TOURIST_KM) {
+    const s0 = kmToS(km), members = [], n = 2 + Math.floor(rnd() * 2);
+    for (let k = 0; k < n; k++) members.push(buildPerson(touristSpec(rnd)));
+    tourists.push({ s0, s: s0, dir: -1, members, meet: false });
+  }
+}
+function updateTourists(dt, time) {
+  const tail = walker.s - (TEAM.length - 1) * SPACING;
+  for (const G of tourists) {
+    const near = Math.abs(G.s - walker.s) < 900;
+    for (const P of G.members) P.root.visible = near;
+    if (!near) continue;
+    G.meet = started && G.s > tail - 14 && G.s < walker.s + 40;
+    if (!G.meet) { // stroll back and forth around their spot so the team always catches them
+      G.s += G.dir * 2.5 * dt;
+      if (G.s < G.s0 - 140) G.dir = 1; else if (G.s > G.s0 + 140) G.dir = -1;
+    }
+    G.members.forEach((P, k) => {
+      const sk = clamp(G.s - G.dir * k * 4.5, 0, trail.len);
+      const q = posAt(sk, tmpV), t = tangentAt(sk, 3), lat = G.meet ? 4 + k * 0.6 : 2.6;
+      q.x += t.z * lat; q.z -= t.x * lat; // left-hand side of the trail
+      P.root.position.copy(q);
+      const face = G.meet ? Math.atan2(-t.z, t.x) : Math.atan2(t.x, t.z) + (G.dir < 0 ? Math.PI : 0);
+      P.root.rotation.y = angleLerp(P.root.rotation.y, face, Math.min(1, dt * 6));
+      if (G.meet) animateWave(P, time, false); else animateWalk(P, dt, 1, 5);
+    });
+  }
+}
+
+// ---------- UI ----------
+const ui = { card: $('card'), prompt: $('prompt') };
+let card = null, photoIdx = 0, photoCredits = {};
+const PLACEHOLDER = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 100"><rect width="160" height="100" fill="#cfe0d0"/>
+   <path d="M0 70 Q40 45 80 62 T160 55 V100 H0Z" fill="#7fae5a"/><path d="M0 82 Q50 66 100 80 T160 76 V100 H0Z" fill="#5d9645"/>
+   <path d="M0 92 h160" stroke="#c49a6c" stroke-width="3"/><circle cx="128" cy="24" r="9" fill="#f3d27a"/>
+   <text x="80" y="40" text-anchor="middle" font-family="system-ui" font-size="8" fill="#3f5a44">photo coming soon</text></svg>`);
+
+function renderCard() {
+  const L = card, photos = L.photos ?? [];
+  $('cardTitle').textContent = L.name;
+  $('cardMeta').textContent = `${L.km.toFixed(2)} km · ${L.ele} m${L.confidence === 'low' ? ' · approx. location' : ''}`;
+  $('cardText').textContent = L.text;
+  $('cardStory').textContent = L.story ?? '';
+  $('cardStory').classList.toggle('hidden', !L.story);
+  const img = $('cardImg');
+  img.onerror = () => { img.onerror = null; img.src = PLACEHOLDER; };
+  img.src = photos.length ? photos[photoIdx] : PLACEHOLDER;
+  img.alt = L.name;
+  const multi = photos.length > 1;
+  $('prevBtn').classList.toggle('hidden', !multi); $('nextBtn').classList.toggle('hidden', !multi);
+  $('photoCount').classList.toggle('hidden', !multi);
+  $('photoCount').textContent = `${photoIdx + 1} / ${photos.length}`;
+  const cr = photoCredits[photos[photoIdx]], credit = $('photoCredit');
+  credit.classList.toggle('hidden', !cr);
+  if (cr) { credit.textContent = `Photo: ${cr.artist} · ${cr.license} · Wikimedia Commons`; credit.href = cr.source; }
+}
+function openCard(L) {
+  if (!L.visited) {
+    L.visited = true; L.marker.orbM.material = markerMats.done; L.marker.beamM.material.opacity = 0.06;
+    $('seenVal').textContent = landmarks.filter((l) => l.visited).length;
+  }
+  card = L; photoIdx = 0; renderCard(); ui.card.classList.remove('hidden');
+  input.fwd = input.back = false; walker.v = 0;
+}
+function closeCard() { card = null; ui.card.classList.add('hidden'); }
+function stepPhoto(d) { if (!card?.photos?.length) return; photoIdx = (photoIdx + d + card.photos.length) % card.photos.length; renderCard(); }
+$('cardClose').onclick = closeCard;
+$('prevBtn').onclick = (e) => { e.stopPropagation(); stepPhoto(-1); };
+$('nextBtn').onclick = (e) => { e.stopPropagation(); stepPhoto(1); };
+ui.card.addEventListener('click', (e) => { if (e.target === ui.card) closeCard(); });
+
+// elevation profile
+const prof = { cv: $('profile'), bg: null };
+function drawProfileBase() {
+  const cv = prof.cv, dpr = Math.min(devicePixelRatio, 2), w = cv.clientWidth, h = cv.clientHeight;
+  cv.width = w * dpr; cv.height = h * dpr;
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const e = gpx.map((p) => p.ele), lo = Math.min(...e) - 20, hi = Math.max(...e) + 10;
+  const X = (d) => 4 + d / gpxLen * (w - 8), Y = (v) => h - 14 - (v - lo) / (hi - lo) * (h - 22);
+  ctx.clearRect(0, 0, w, h);
+  ctx.beginPath(); ctx.moveTo(X(0), h - 14);
+  gpx.forEach((p) => ctx.lineTo(X(p.d), Y(p.ele)));
+  ctx.lineTo(X(gpxLen), h - 14); ctx.closePath();
+  ctx.fillStyle = 'rgba(63,125,58,.28)'; ctx.fill();
+  ctx.beginPath(); gpx.forEach((p, i) => (i ? ctx.lineTo : ctx.moveTo).call(ctx, X(p.d), Y(p.ele)));
+  ctx.strokeStyle = '#3f7d3a'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.fillStyle = '#5b6b5e'; ctx.font = '10px system-ui';
+  for (let k = 0; k <= 12; k += 2) ctx.fillText(`${k}`, X(k * 1000) - 3, h - 2);
+  ctx.fillText(`${Math.round(hi)} m`, w - 44, 10);
+  prof.base = ctx.getImageData(0, 0, cv.width, cv.height);
+  prof.X = X; prof.Y = Y; prof.ctx = ctx;
+}
+function drawProfile(s) {
+  const { ctx, X, Y } = prof; if (!ctx) return;
+  ctx.putImageData(prof.base, 0, 0);
+  for (const L of landmarks) {
+    ctx.fillStyle = L.visited ? '#6fbf5c' : '#e0a93a';
+    ctx.fillRect(X(L.km * 1000) - 1, prof.cv.clientHeight - 16, 2, 5);
+  }
+  const d = s / trail.len * gpxLen;
+  ctx.beginPath(); ctx.arc(X(d), Y(eleAtS(s)), 4.5, 0, Math.PI * 2);
+  ctx.fillStyle = '#c9772e'; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+}
+
+// ---------- input ----------
+const input = { fwd: false, back: false, run: false, keys: new Set(), drag: null, yaw: 0, pitch: 0, lastDrag: 0, touchWalk: false, touchBack: false,
+  auto: false, runOn: false, speed: 1, look: 0 };
+function setAuto(on) { input.auto = on; $('btnWalk').classList.toggle('on', on); $('btnWalk').textContent = on ? '■ Stop' : '▶ Walk'; }
+addEventListener('keydown', (e) => {
+  if (e.repeat && (e.code === 'KeyE' || e.code === 'Escape' || e.code === 'Space')) return;
+  input.keys.add(e.code);
+  if (e.code === 'KeyS' || e.code === 'ArrowDown') setAuto(false);
+  if (e.code === 'Escape') { if (card) closeCard(); }
+  else if (e.code === 'Space' && started && !card) { e.preventDefault(); setAuto(!input.auto); }
+  else if (e.code === 'KeyE') { if (card) closeCard(); else if (nearLandmark) openCard(nearLandmark); }
+  else if (card && (e.code === 'ArrowRight' || e.code === 'ArrowLeft')) stepPhoto(e.code === 'ArrowRight' ? 1 : -1);
+});
+addEventListener('keyup', (e) => input.keys.delete(e.code));
+addEventListener('blur', () => input.keys.clear());
+const cv = $('c');
+// click / tap a landmark marker (post, orb or light beam) to open its card
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+function markerAt(cx, cy) {
+  if (!landmarks) return null;
+  ndc.set(cx / innerWidth * 2 - 1, -(cy / innerHeight) * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  const targets = landmarks.flatMap((L) => (L.photoBoard ? [L.marker.g, L.photoBoard] : [L.marker.g]));
+  const hit = ray.intersectObjects(targets, true)[0];
+  if (!hit) return null;
+  for (let o = hit.object; o; o = o.parent) if (o.userData.L) return o.userData.L;
+  return null;
+}
+cv.addEventListener('pointerdown', (e) => {
+  cv.setPointerCapture(e.pointerId);
+  input.drag = { x: e.clientX, y: e.clientY };
+  input.down = { x: e.clientX, y: e.clientY, t: performance.now() };
+  if (e.pointerType !== 'mouse') input.touchWalk = true;
+});
+cv.addEventListener('pointerup', (e) => {
+  const d = input.down; input.down = null;
+  if (!d || !started || card || finished || performance.now() - d.t > 450 || Math.hypot(e.clientX - d.x, e.clientY - d.y) > 6) return;
+  const L = markerAt(e.clientX, e.clientY);
+  if (L) openCard(L);
+});
+cv.addEventListener('pointermove', (e) => {
+  if (!input.drag) { if (started && e.pointerType === 'mouse') cv.style.cursor = markerAt(e.clientX, e.clientY) ? 'pointer' : ''; return; }
+  input.yaw -= (e.clientX - input.drag.x) * 0.005;
+  input.pitch = clamp(input.pitch + (e.clientY - input.drag.y) * 0.004, -0.5, 0.9);
+  input.drag.x = e.clientX; input.drag.y = e.clientY; input.lastDrag = performance.now();
+});
+const endDrag = () => { input.drag = null; input.touchWalk = false; input.lastDrag = performance.now(); };
+cv.addEventListener('pointerup', endDrag); cv.addEventListener('pointercancel', endDrag);
+// on-screen controls
+const hold = (el, on, off) => {
+  el.addEventListener('pointerdown', (e) => { e.preventDefault(); el.setPointerCapture(e.pointerId); on(); });
+  for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) el.addEventListener(ev, off);
+};
+const lookOff = () => { input.look = 0; input.lastDrag = performance.now(); };
+hold($('btnBack'), () => { input.touchBack = true; setAuto(false); }, () => { input.touchBack = false; });
+hold($('btnLookL'), () => { input.look = 1; }, lookOff);
+hold($('btnLookR'), () => { input.look = -1; }, lookOff);
+$('btnWalk').onclick = () => setAuto(!input.auto);
+$('btnSpeed').onclick = () => { input.speed = input.speed === 1 ? 2 : 1; $('btnSpeed').textContent = `${input.speed}×`; };
+$('btnRun').onclick = () => { input.runOn = !input.runOn; $('btnRun').classList.toggle('on', input.runOn); };
+ui.prompt.addEventListener('click', () => { if (nearLandmark) openCard(nearLandmark); });
+
+// ---------- main loop ----------
+let walker, team = [], started = false, finished = false, nearLandmark = null;
+const tmpV = new THREE.Vector3(), camTarget = new THREE.Vector3(), camPos = new THREE.Vector3(), npcPos = new THREE.Vector3();
+// team formation: together at the start, then single file with stretches of walking two by two
+// each entry: (k) => [metres behind the leader, metres right of the path centre]
+const FORMATIONS = {
+  group: (k) => [-[0, 0, 3.5, 3.5, 6.5][k], [-1.2, 1.2, -1.2, 1.2, 0][k]],
+  pairs: (k) => [-Math.floor(k / 2) * 6, k === 4 ? 0 : (k % 2 ? 1.1 : -1.1)],
+  file: (k) => [-k * SPACING, k % 2 ? 0.8 : -0.8],
+};
+function formationAt(s) {
+  if (s < START_S + 150) return 'group';
+  return (s - START_S) % 1100 > 700 ? 'pairs' : 'file';
+}
+let camHeading = 0;
+
+function update(dt, time) {
+  const k = input.keys;
+  const blocked = !started || card || finished;
+  const fwd = !blocked && (k.has('KeyW') || k.has('ArrowUp') || input.auto || (input.touchWalk && !input.touchBack));
+  const bwd = !blocked && (k.has('KeyS') || k.has('ArrowDown') || input.touchBack);
+  const run = input.runOn || k.has('ShiftLeft') || k.has('ShiftRight');
+  const target = ((fwd ? 1 : 0) - (bwd ? 1 : 0)) * (run ? CONFIG.RUN_SPEED : CONFIG.WALK_SPEED) * input.speed;
+  walker.v += (target - walker.v) * Math.min(1, dt * 5);
+  if (blocked) walker.v = 0;
+  walker.s = clamp(walker.s + walker.v * dt, 0, trail.len);
+  if ((walker.s === 0 && walker.v < 0) || (walker.s === trail.len && walker.v > 0)) walker.v = 0;
+
+  // place the team in single file behind the leader (walker.s = leader)
+  const moving = Math.min(1, Math.abs(walker.v) / CONFIG.WALK_SPEED);
+  const rate = 6 + 4 * Math.min(1, Math.abs(walker.v) / CONFIG.RUN_SPEED);
+  const bathing = bathSpot && card === bathSpot.L;
+  const p = new THREE.Vector3(), look = new THREE.Vector3();
+  const form = FORMATIONS[formationAt(walker.s)], fk = Math.min(1, dt * 1.5);
+  team.forEach((P, k) => {
+    if (bathing && P.o.name === 'Adithya') {
+      P.root.position.set(bathSpot.x, bathSpot.y - 1.6, bathSpot.z);
+      P.root.rotation.y += dt * 0.8;
+      animateWave(P, time, true);
+      return;
+    }
+    const [ta, tl] = form(k);
+    P.fa = P.fa === undefined ? ta : lerp(P.fa, ta, fk); P.fl = P.fl === undefined ? tl : lerp(P.fl, tl, fk);
+    const sk = clamp(walker.s + P.fa, 0, trail.len);
+    const q = posAt(sk, tmpV), t = tangentAt(sk, 3), lat = P.fl;
+    q.x += -t.z * lat; q.z += t.x * lat;
+    P.root.position.copy(q);
+    const heading = Math.atan2(t.x, t.z);
+    P.root.rotation.y = angleLerp(P.root.rotation.y, walker.v < -0.5 ? heading + Math.PI : heading, Math.min(1, dt * 8));
+    animateWalk(P, dt, moving, rate);
+    if (P === rainGear.dinusha && rainGear.umbrella.visible) { P.armR.rotation.x = -1.2; P.armR.rotation.z = 0; } // holding the umbrella
+    if (k === CAM_FOLLOW) p.copy(q);
+    if (k === CAM_LOOK) look.copy(q);
+  });
+  if (bathing) p.copy(posAt(clamp(walker.s - CAM_FOLLOW * SPACING, 0, trail.len), tmpV));
+  for (const n of npcs) {
+    const far = n.P.root.getWorldPosition(npcPos).distanceToSquared(p) > 600 * 600;
+    n.P.root.visible = !far;
+    if (far) continue;
+    if (n.anim === 'wave') animateWave(n.P, time, false);
+    else if (n.anim === 'offer') { n.P.armR.rotation.x = -1.2 + Math.sin(time * 2 + n.P.phase) * 0.15; n.P.armL.rotation.z = -2.6 + Math.sin(time * 8) * 0.3; }
+    else if (n.anim === 'scope') { n.P.body.rotation.x = 0.3; n.P.armL.rotation.x = n.P.armR.rotation.x = -1.3; n.P.root.rotation.y = Math.sin(time * 0.4) * 0.5; }
+    else if (n.anim === 'pluck') { n.P.body.rotation.x = 0.45; n.P.armR.rotation.x = -1 + Math.sin(time * 3 + n.P.phase) * 0.4; n.P.armL.rotation.x = -0.9; }
+    else n.P.body.rotation.y = Math.sin(time * 0.7 + n.P.phase) * 0.25;
+  }
+  updateTourists(dt, time);
+  updateRain(dt, p);
+  const meS = clamp(walker.s - CAM_FOLLOW * SPACING, 0, trail.len);
+
+  // camera: behind along a smoothed trail heading, with drag orbit that springs back
+  const ts = tangentAt(meS, 10);
+  camHeading = angleLerp(camHeading, Math.atan2(ts.x, ts.z), Math.min(1, dt * 1.6));
+  const kLook = (k.has('KeyA') ? 1 : 0) - (k.has('KeyD') ? 1 : 0), look3 = input.look || kLook;
+  if (look3) { input.yaw += look3 * dt * 1.6; input.lastDrag = performance.now(); }
+  if (!input.drag && performance.now() - input.lastDrag > 1500) {
+    input.yaw *= Math.exp(-dt * 1.5); input.pitch *= Math.exp(-dt * 1.5);
+  }
+  const yaw = camHeading + Math.PI + input.yaw, dist = 24, hgt = 9 + input.pitch * 18;
+  camTarget.set(p.x + Math.sin(yaw) * dist, p.y + hgt, p.z + Math.cos(yaw) * dist);
+  camTarget.y = Math.max(camTarget.y, heightAt(camTarget.x, camTarget.z) + 4);
+  // lift the camera until the hillside no longer blocks the line of sight to the walker
+  for (let k = 1; k <= 6; k++) {
+    const f = k / 7, lx = lerp(camTarget.x, p.x, f), lz = lerp(camTarget.z, p.z, f);
+    const lineY = lerp(camTarget.y, p.y + 4.5, f), ground = heightAt(lx, lz) + 2.5;
+    if (ground > lineY) camTarget.y += (ground - lineY) / (1 - f);
+  }
+  camPos.lerp(camTarget, 1 - Math.exp(-dt * 4));
+  camPos.y = Math.max(camPos.y, heightAt(camPos.x, camPos.z) + 3);
+  camera.position.copy(camPos);
+  camera.lookAt(look.x, look.y + 4, look.z);
+
+  // sun + shadows follow the walker
+  sun.position.copy(p).addScaledVector(SUN_DIR, 300); sun.target.position.copy(p);
+
+  // landmarks
+  nearLandmark = null;
+  for (const L of landmarks) {
+    L.marker.orbM.position.y = 7.3 + Math.sin(time * 2 + L.s) * 0.35;
+    L.marker.orbM.rotation.y += dt;
+    if (Math.abs(walker.s - L.s) < CONFIG.TRIGGER_M) {
+      if (!L.visited && started && !card && !finished) openCard(L);
+      if (!nearLandmark || Math.abs(walker.s - L.s) < Math.abs(walker.s - nearLandmark.s)) nearLandmark = L;
+    }
+  }
+  const showPrompt = started && !card && !finished && nearLandmark;
+  ui.prompt.classList.toggle('hidden', !showPrompt);
+  if (showPrompt) ui.prompt.innerHTML = `★ ${nearLandmark.name} · ${isTouch ? 'tap to view' : '<kbd>E</kbd> to view'}`;
+
+  // HUD
+  $('distVal').textContent = sToKm(walker.s).toFixed(2);
+  $('eleVal').textContent = Math.round(eleAtS(walker.s));
+  drawProfile(walker.s);
+
+  if (!finished && !card && started && walker.s >= trail.len - 1) showFinish();
+}
+
+function showFinish() {
+  finished = true; setAuto(false);
+  let gain = 0, loss = 0;
+  for (let i = 1; i < gpx.length; i++) { const d = gpx[i].ele - gpx[i - 1].ele; if (d > 0) gain += d; else loss -= d; }
+  const seen = landmarks.filter((l) => l.visited).length;
+  $('finishStats').innerHTML = `You walked <b>${(gpxLen / 1000).toFixed(2)} km</b> from Hanthana to Galaha.<br>
+    Climb <b>${Math.round(gain)} m</b> · descent <b>${Math.round(loss)} m</b> · high point <b>${Math.round(Math.max(...gpx.map((p) => p.ele)))} m</b><br>
+    Landmarks seen: <b>${seen} / ${landmarks.length}</b>`;
+  $('finish').classList.remove('hidden');
+}
+function restartWalk() {
+  closeCard(); setAuto(false);
+  $('finish').classList.add('hidden'); finished = false; walker.s = START_S; walker.v = 0;
+  for (const L of landmarks) { L.visited = false; L.marker.orbM.material = markerMats.todo; L.marker.beamM.material.opacity = 0.22; }
+  $('seenVal').textContent = '0';
+  for (const P of team) P.fa = P.fl = undefined;
+  rainNotified = false;
+  // jump the camera back too instead of flying it across the whole stage
+  const p = posAt(0, tmpV), t = tangentAt(0, 10);
+  camHeading = Math.atan2(t.x, t.z); camPos.set(p.x - t.x * 30, p.y + 15, p.z - t.z * 30);
+  input.yaw = input.pitch = 0;
+}
+$('againBtn').onclick = restartWalk;
+$('btnRestart').onclick = restartWalk;
+
+// ---------- debug self-check ----------
+async function selfCheck(counts) {
+  const rows = [];
+  const check = (name, ok, detail) => rows.push({ check: name, ok: ok ? 'PASS' : 'FAIL', detail });
+  check('route length ≈ 12.84 km', Math.abs(gpxLen / 1000 - 12.84) < 0.13, `${(gpxLen / 1000).toFixed(2)} km (curve ${(trail.len / 1000).toFixed(2)} km)`);
+  const { gx0, gz0, nx, nz, C } = grid;
+  const inside = gpx.every((p) => { const [x, z] = proj.toXZ(p.lat, p.lon); return x > gx0 && z > gz0 && x < gx0 + (nx - 1) * C && z < gz0 + (nz - 1) * C; });
+  check('terrain covers route', inside, `${nx}×${nz} grid @ ${C} m`);
+  check('landmark km within route', landmarks.every((l) => l.km >= 0 && l.km * 1000 <= gpxLen + 200), `${landmarks.length} landmarks`);
+  let err = 0; for (const p of gpx) { const [x, z] = proj.toXZ(p.lat, p.lon); err += Math.abs(heightAt(x, z) / CONFIG.VERT_EXAG + CONFIG.BASE_ELE - p.ele); }
+  err /= gpx.length; check('DEM vs GPX elevation', err < 35, `mean |Δ| ${err.toFixed(1)} m`);
+  let gap = 0; for (let i = 0; i < trail.n; i++) gap = Math.max(gap, Math.abs(trail.y[i] - heightAt(trail.x[i], trail.z[i])));
+  check('trail sits on terrain', gap < 1, `max gap ${gap.toFixed(2)} m`);
+  const urls = [...new Set(landmarks.flatMap((l) => l.photos ?? []))];
+  const bad = (await Promise.all(urls.map((u) => fetch(u, { method: 'HEAD' }).then((r) => (r.ok ? null : u)).catch(() => u)))).filter(Boolean);
+  check('photos reachable', !bad.length, bad.length ? bad.join(', ') : `${urls.length} photos`);
+  check('props placed', true, JSON.stringify(counts));
+  console.table(rows);
+  window.__selfCheck = rows;
+}
+
+// ---------- boot ----------
+async function boot() {
+  setProgress(0.03, 'Loading route…');
+  gpx = await loadGPX(CONFIG.gpx);
+  gpxLen = gpx[gpx.length - 1].d;
+  $('distTotal').textContent = (gpxLen / 1000).toFixed(2);
+  proj = makeProjection(gpx);
+  setProgress(0.08, 'Loading landmarks…');
+  const lm = await (await fetchOk(CONFIG.landmarks)).json();
+  photoCredits = await fetch('data/photo-credits.json').then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
+  setProgress(0.12, 'Loading terrain…');
+  const dem = await loadDEM((f) => setProgress(0.12 + f * 0.4, 'Loading terrain…'));
+  [IMG.logo, IMG.map] = await Promise.all(['photos/logo.png', 'photos/stage-01-map.png']
+    .map((u) => loadImage(u).catch(() => { console.warn('image failed to load:', u); return null; })));
+  await nextFrame();
+
+  setProgress(0.55, 'Shaping hills…'); await nextFrame();
+  const xs = gpx.map((p) => proj.toXZ(p.lat, p.lon));
+  grid = buildGrid(dem, { minX: Math.min(...xs.map((v) => v[0])), maxX: Math.max(...xs.map((v) => v[0])), minZ: Math.min(...xs.map((v) => v[1])), maxZ: Math.max(...xs.map((v) => v[1])) });
+  buildTrail();
+  landmarks = lm.landmarks.map((l) => ({ ...l, s: kmToS(l.km), visited: false }));
+  $('seenTotal').textContent = landmarks.length;
+
+  setProgress(0.65, 'Painting tea estates…'); await nextFrame();
+  scene.add(makeSky(), makeRidges());
+  buildTerrainMesh();
+  buildTrailRibbon();
+  setProgress(0.8, 'Planting tea bushes and pines…'); await nextFrame();
+  const counts = scatterProps();
+  siteProps();
+  buildSigns();
+  buildWaymarks();
+  buildMarkers();
+  buildPhotoBoards();
+  team = TEAM.map(buildPerson);
+  addRainGear();
+  buildRain();
+  buildStoryScenes();
+  buildTourists();
+  walker = { s: START_S, v: 0 };
+
+  const p = posAt(0, new THREE.Vector3()), t = tangentAt(0, 10);
+  camHeading = Math.atan2(t.x, t.z);
+  camPos.set(p.x - t.x * 60, p.y + 40, p.z - t.z * 60);
+
+  setProgress(1, 'Ready');
+  $('startBtn').disabled = false;
+  $('startBtn').onclick = () => {
+    $('start').classList.add('hidden');
+    for (const id of ['hud', 'profileWrap']) $(id).classList.remove('hidden');
+    drawProfileBase();
+    $('ctrlBar').classList.remove('hidden');
+    const hint = $('hint');
+    hint.textContent = isTouch ? 'Tap ▶ Walk or hold the screen · drag to look around' : 'W / ↑ or ▶ Walk to walk · Shift to run · drag to look around';
+    hint.classList.remove('hidden');
+    setTimeout(() => { hint.style.opacity = 0; }, 6000);
+    started = true;
+  };
+  if (DEBUG) { selfCheck(counts); window.__dbg = { walker, landmarks, kmToS, SITE_PROPS, tourists, npcs, input, team, camera, renderer, scene, posAt, tangentAt }; }
+
+  const clock = new THREE.Clock();
+  renderer.setAnimationLoop(() => {
+    const dt = Math.min(clock.getDelta(), 0.05);
+    update(dt, clock.elapsedTime);
+    renderer.render(scene, camera);
+  });
+}
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  if (started) drawProfileBase();
+});
+
+boot().catch((e) => { console.error(e); if (!$('loadLabel').style.color) fail(`Could not load the walk: ${e.message}`); });
+</script>
+</body>
+</html>

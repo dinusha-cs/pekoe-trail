@@ -1,0 +1,309 @@
+{
+  "stage": 1,
+  "name": "Hanthana to Galaha",
+  "gpx": "the-pekoe-trail-stage-1-hantana-to-galaha-official-profile.gpx",
+  "gpxLengthKm": 12.84,
+  "officialLengthKm": 13.01,
+  "note": "km = distance along GPX. Site distances scaled by gpx/official length. Low-confidence entries placed by scenery match only.",
+  "landmarks": [
+    {
+      "id": "tea-museum",
+      "name": "Ceylon Tea Museum (trailhead)",
+      "km": 0.0,
+      "lat": 7.268463,
+      "lon": 80.632482,
+      "ele": 781,
+      "source": "osm",
+      "confidence": "high",
+      "text": "Start of Stage 1, in the former Hantana tea factory. The top floor has a tea shop and tea tasting room.",
+      "photos": [
+        "photos/commons-tea-museum.jpg",
+        "photos/Museum top floor-1.webp",
+        "photos/s12.webp",
+        "photos/s4.webp"
+      ]
+    },
+    {
+      "id": "sandagiri-stupa",
+      "name": "Hanthana Sandagiri Maha Seya",
+      "km": 0.95,
+      "lat": 7.263461,
+      "lon": 80.635775,
+      "ele": 873,
+      "source": "osm + team memory",
+      "confidence": "high",
+      "text": "The white Sandagiri Maha Seya on the ridge, seen on the left of the trail in the first kilometre.",
+      "photos": [
+        "photos/sandagiri-seya.jpg",
+        "photos/s3.webp"
+      ],
+      "side": "left"
+    },
+    {
+      "id": "kandy-view",
+      "name": "View back over Hanthana & Knuckles",
+      "km": 2.0,
+      "lat": 7.256627,
+      "lon": 80.632237,
+      "ele": 876,
+      "source": "photo match",
+      "confidence": "medium",
+      "text": "Looking back at the Hanthana towers, the stupa and the Knuckles range on the horizon.",
+      "photos": [
+        "photos/s11.webp",
+        "photos/commons-hantana-highest-peak.jpg"
+      ]
+    },
+    {
+      "id": "shooting-club",
+      "name": "W15 Hotel & Hill Country Sport Shooting Club",
+      "km": 2.85,
+      "lat": 7.250446,
+      "lon": 80.63085,
+      "ele": 911,
+      "source": "osm",
+      "confidence": "high",
+      "text": "Trail passes W15 Hanthana and the shooting club.",
+      "photos": [
+        "photos/W15 Hotel.jpg",
+        "photos/commons-hanthana-galaha-road.jpg"
+      ]
+    },
+    {
+      "id": "sugarcane",
+      "name": "Sugarcane Quarantine Center",
+      "km": 3.06,
+      "lat": 7.24925,
+      "lon": 80.630242,
+      "ele": 928,
+      "source": "site 3.1 km",
+      "confidence": "medium",
+      "text": "Sugarcane quarantine station of the Sugarcane Research Institute.",
+      "photos": [
+        "photos/Sugarcane Quarantine Center.jpg",
+        "photos/commons-hanthana-galaha-road-2.jpg"
+      ]
+    },
+    {
+      "id": "boulder-field",
+      "name": "Boulders above the valley",
+      "km": 3.6,
+      "lat": 7.245336,
+      "lon": 80.630211,
+      "ele": 961,
+      "source": "photo match",
+      "confidence": "low",
+      "text": "Granite boulders among the trees with the towered Hanthana peak behind.",
+      "photos": [
+        "photos/s8.webp",
+        "photos/commons-hantana-peaks.jpg"
+      ]
+    },
+    {
+      "id": "tea-estate",
+      "name": "Hanthana tea estate",
+      "km": 4.2,
+      "lat": 7.241257,
+      "lon": 80.632596,
+      "ele": 995,
+      "source": "photo match",
+      "confidence": "low",
+      "text": "Shaded estate roads between tea bushes and tall shade trees; often misty.",
+      "photos": [
+        "photos/s2-1.webp",
+        "photos/s10.webp",
+        "photos/s1.webp",
+        "photos/ba16e881-66b6-4146-8e22-0a1d752ab970.jpg"
+      ],
+      "story": "Tea pluckers at work on the slopes, one of the many people we met on the way.",
+      "event": "pluckers"
+    },
+    {
+      "id": "meditation-stupa",
+      "name": "Side trail to meditation stupa",
+      "km": 5.13,
+      "lat": 7.23615,
+      "lon": 80.637122,
+      "ele": 1031,
+      "source": "site 5.2 km",
+      "confidence": "medium",
+      "text": "Short detour to a secluded meditation stupa.",
+      "photos": [
+        "photos/Side trail to meditation stupa.webp"
+      ]
+    },
+    {
+      "id": "pine-boulders",
+      "name": "Pines & boulders near the top",
+      "km": 5.4,
+      "lat": 7.234273,
+      "lon": 80.638196,
+      "ele": 1053,
+      "source": "photo match",
+      "confidence": "low",
+      "text": "Pine stand and boulders on the final climb.",
+      "photos": [
+        "photos/s5.webp",
+        "photos/14f6abed-42e4-4042-b526-4b6b5a9957e7.jpg"
+      ]
+    },
+    {
+      "id": "summit",
+      "name": "Highest point & viewpoint",
+      "km": 5.76,
+      "lat": 7.232965,
+      "lon": 80.640757,
+      "ele": 1067,
+      "source": "gpx max elevation",
+      "confidence": "high",
+      "text": "Top of the stage (~1,067 m): views to Victoria Reservoir and the Knuckles Range.",
+      "photos": [
+        "photos/6b7c7e89-1ba8-403e-9352-8cfd27ec10e5.jpg",
+        "photos/e8863e5d-b664-4757-b5e9-6a708027dec6.jpg"
+      ]
+    },
+    {
+      "id": "katusu-konda",
+      "name": "Katusu Konda rock faces",
+      "km": 6.61,
+      "lat": 7.227849,
+      "lon": 80.642725,
+      "ele": 1050,
+      "source": "osm",
+      "confidence": "high",
+      "text": "Sheer rock cliffs of the Katusu Konda range above the trail. Look for the trail's painted rock markers.",
+      "photos": [
+        "photos/team.jpeg",
+        "photos/s9.webp",
+        "photos/s6.webp",
+        "photos/86164203-752f-4b10-93bf-c3e182e4ed20.jpg"
+      ],
+      "story": "Team photo under the Katusu Konda cliffs: Adithya, Sudesh, Dinusha, Theshawa and Sithara."
+    },
+    {
+      "id": "valley-view",
+      "name": "Descent views",
+      "km": 7.5,
+      "lat": 7.222903,
+      "lon": 80.645952,
+      "ele": 1014,
+      "source": "photo match",
+      "confidence": "low",
+      "text": "Long views over layered hills on the way down.",
+      "photos": [
+        "photos/s7.webp",
+        "photos/commons-hantana-after-rain.jpg"
+      ]
+    },
+    {
+      "id": "stone-stream",
+      "name": "Stream crossing the road",
+      "km": 8.5,
+      "lat": 7.217673,
+      "lon": 80.64969,
+      "ele": 962,
+      "source": "team memory",
+      "confidence": "medium",
+      "text": "A stream crosses the road here; the stone-lined pool is on the right-hand side.",
+      "photos": [
+        "photos/s13.webp"
+      ],
+      "story": "Bath time where the stream crosses the road! Everyone cooled off, and Adithya went all in for a full bath.",
+      "event": "bath",
+      "side": "right"
+    },
+    {
+      "id": "small-kovil",
+      "name": "Small Hindu kovil",
+      "km": 8.0,
+      "lat": 7.220314,
+      "lon": 80.647399,
+      "ele": 986,
+      "source": "team memory",
+      "confidence": "medium",
+      "text": "A small roadside Hindu kovil on the right of the road, with village kids around it.",
+      "photos": [
+        "photos/Small Hindu kovil.jpg"
+      ],
+      "story": "We filled our water bottles at the kovil and gave 5 chocolates to the kids at the temple.",
+      "event": "kovil",
+      "side": "right"
+    },
+    {
+      "id": "kids-flowers",
+      "name": "Chocolates for flowers",
+      "km": 8.2,
+      "lat": 7.21887,
+      "lon": 80.647699,
+      "ele": 986,
+      "source": "team memory",
+      "confidence": "low",
+      "text": "More kids along the road, just after the kovil.",
+      "photos": [],
+      "story": "We gave 2 more chocolates to some kids, and they gave us a bouquet of flowers in return.",
+      "event": "flowers",
+      "side": "right"
+    },
+    {
+      "id": "film-site",
+      "name": "Temple of Doom film area",
+      "km": 9.87,
+      "lat": 7.208823,
+      "lon": 80.654022,
+      "ele": 882,
+      "source": "site ~10 km",
+      "confidence": "medium",
+      "text": "Dense forest section linked to the filming of Indiana Jones and the Temple of Doom.",
+      "photos": [
+        "photos/indian-johns-doom-temple.jpg",
+        "photos/indian-johns-doom-temple-2.jpg"
+      ]
+    },
+    {
+      "id": "pine-forest",
+      "name": "Pine forest road",
+      "km": 10.66,
+      "lat": 7.204798,
+      "lon": 80.656854,
+      "ele": 828,
+      "source": "site 10.8 km",
+      "confidence": "medium",
+      "text": "Pine forest near the end of the stage; slippery in rain.",
+      "photos": [
+        "photos/61ef04d7-6cbb-45ab-b76a-461e941594d8.jpg"
+      ]
+    },
+    {
+      "id": "galaha-town",
+      "name": "Galaha town",
+      "km": 12.5,
+      "lat": 7.198559,
+      "lon": 80.667641,
+      "ele": 820,
+      "source": "photo match",
+      "confidence": "medium",
+      "text": "Into Galaha: shops, a Hindu kovil and trail arrows on the walls.",
+      "photos": [
+        "photos/304b1253-fee2-4197-8995-59cd39b0214a.jpg",
+        "photos/commons-galaha-1.jpg"
+      ],
+      "story": "We met a few people along the trail; locals were happy to chat with five hikers.",
+      "event": "locals"
+    },
+    {
+      "id": "galaha-post-office",
+      "name": "Galaha Post Office (finish)",
+      "km": 12.67,
+      "lat": 7.197495,
+      "lon": 80.668604,
+      "ele": 828,
+      "source": "osm",
+      "confidence": "high",
+      "text": "End of Stage 1.",
+      "photos": [
+        "photos/Galaha Post Office.jpg",
+        "photos/commons-galaha.jpg"
+      ]
+    }
+  ]
+}
