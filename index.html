@@ -1020,13 +1020,20 @@ let rainGear = null, rain = null, rainNotified = false;
 function addRainGear() {
   const m = (c) => lambert({ color: c });
   const dinusha = team.find((P) => P.o.name === 'Dinusha'), sudesh = team.find((P) => P.o.name === 'Sudesh');
+  // chocolate bars for the front two, shown when handing them to the kids
+  for (const P of team.slice(0, 2)) {
+    const bar = new THREE.Group();
+    bar.add(new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.28, 0.05).translate(0, -0.72, 0.08), m('#5a2d17')));
+    bar.add(new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.12, 0.06).translate(0, -0.64, 0.08), m('#b91c1c'))); // wrapper
+    bar.visible = false; P.armR.add(bar); P.chocolate = bar;
+  }
   const umbrella = new THREE.Group();
   umbrella.add(new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 1.5, 5).translate(0, 0.75, 0), m('#2b2b2b')));
   umbrella.add(new THREE.Mesh(new THREE.ConeGeometry(0.95, 0.38, 8, 1, true).translate(0, 1.62, 0),
-    new THREE.MeshLambertMaterial({ color: '#1f2937', flatShading: true, side: THREE.DoubleSide })));
+    new THREE.MeshLambertMaterial({ color: '#7e22ce', flatShading: true, side: THREE.DoubleSide }))); // purple umbrella
   umbrella.position.set(0.36, 1.2, 0.5);
   dinusha.body.add(umbrella);
-  const coat = new THREE.Group(), cm = m('#1e40af');
+  const coat = new THREE.Group(), cm = m('#141414'); // black raincoat
   coat.add(new THREE.Mesh(new THREE.BoxGeometry(0.66, 0.74, 0.78).translate(0, 1.2, -0.15), cm)); // over the backpack too
   coat.add(new THREE.Mesh(new THREE.ConeGeometry(0.46, 0.55, 8).translate(0, 0.72, -0.08), cm));
   coat.add(new THREE.Mesh(new THREE.SphereGeometry(0.235, 8, 6, 0, Math.PI * 2, 0, Math.PI / 1.8).translate(0, 1.78, -0.02), cm));
@@ -1085,7 +1092,9 @@ function buildStoryScenes() {
     P.root.position.set(at.x, at.y - 0.2, at.z);
     P.root.rotation.y = Math.atan2(at.fx - at.x, at.fz - at.z) + (rnd() - 0.5) * 0.6;
     npcs.push({ P, anim });
+    return P;
   };
+  const teaSpots = [], pickers = []; // where women pluck tea; gets a dense plantation below
   const SARI = ['#c2410c', '#7c3aed', '#be185d', '#0f766e', '#b45309'];
   const KID = ['#ef4444', '#f59e0b', '#3b82f6', '#22c55e', '#ec4899'];
   for (const L of landmarks) {
@@ -1093,10 +1102,11 @@ function buildStoryScenes() {
       addNPC({ shirt: '#e5e7eb', skirt: '#2563eb', pants: '#2563eb', skin: '#7a4a30' }, side(L, 9, -6), 'idle');
       addNPC({ shirt: '#f1e3c8', skirt: '#57534e', pants: '#57534e', skin: '#80513a', hair: '#d6d3d1' }, side(L, 10, 4), 'idle');
     } else if (L.event === 'pluckers') {
+      teaSpots.push(L);
       for (let k = 0; k < 5; k++) {
         const c = SARI[k % SARI.length];
-        addNPC({ shirt: c, skirt: c, pants: c, hat: 'scarf', hatColor: '#f5f5f4', basket: true, skin: '#7b4a2f' },
-          side(L, 16 + rnd() * 30, (rnd() - 0.5) * 80), 'pluck');
+        pickers.push(addNPC({ shirt: c, skirt: c, pants: c, hat: 'scarf', hatColor: '#f5f5f4', basket: true, skin: '#7b4a2f' },
+          side(L, 16 + rnd() * 30, (rnd() - 0.5) * 80), 'pluck'));
       }
     } else if (L.event === 'kovil') {
       // small roadside shrine: painted base, little stepped tower, water tap; 5 kids got chocolates here
@@ -1143,13 +1153,36 @@ function buildStoryScenes() {
     const zone = zoneAtKm(sToKm(s));
     if ((zone !== 'tea' && zone !== 'teaforest') || landmarks.some((l) => Math.abs(l.s - s) < 90)) continue;
     const spot = { s, side: rnd() < 0.5 ? 'right' : 'left' }, n = 2 + Math.floor(rnd() * 3);
+    teaSpots.push(spot);
     for (let k = 0; k < n; k++) {
       const c = SARI[Math.floor(rnd() * SARI.length)];
-      addNPC({ shirt: c, skirt: c, pants: c, hat: 'scarf', hatColor: '#f5f5f4', basket: true, skin: '#7b4a2f' },
-        side(spot, 12 + rnd() * 26, (rnd() - 0.5) * 50), 'pluck');
+      pickers.push(addNPC({ shirt: c, skirt: c, pants: c, hat: 'scarf', hatColor: '#f5f5f4', basket: true, skin: '#7b4a2f' },
+        side(spot, 12 + rnd() * 26, (rnd() - 0.5) * 50), 'pluck'));
     }
   }
+  // well-kept plantation around each plucking spot: tight rows of tea bushes, gaps left where the women stand
+  const mats = [], dummy = new THREE.Object3D();
+  const slopeAt = (x, z) => Math.hypot(heightAt(x + 2, z) - heightAt(x - 2, z), heightAt(x, z + 2) - heightAt(x, z - 2)) / 4;
+  for (const spot of teaSpots) {
+    for (let d = 6; d <= 50; d += 2.7) for (let a = -45; a <= 45; a += 2.3) {
+      const at = side(spot, d, a + (rnd() - 0.5) * 0.4);
+      if (nearestTrail(at.x, at.z, 12).d < 5.5 || slopeAt(at.x, at.z) > 1.1) continue;
+      if (pickers.some((P) => Math.hypot(P.root.position.x - at.x, P.root.position.z - at.z) < 1.8)) continue;
+      dummy.position.set(at.x, at.y - 0.25, at.z);
+      dummy.rotation.set(0, Math.atan2(at.fx - at.x, at.fz - at.z), 0); // bushes stretched along the row
+      const sc = 0.85 + rnd() * 0.2; dummy.scale.set(sc, sc, sc * 0.8); dummy.updateMatrix();
+      mats.push(dummy.matrix.clone());
+    }
+  }
+  if (mats.length) {
+    const mesh = new THREE.InstancedMesh(PROP_GEOS.tea(), propMat, mats.length), c = new THREE.Color();
+    mats.forEach((m, k) => { mesh.setMatrixAt(k, m); mesh.setColorAt(k, c.set(TINTS.tea[k % TINTS.tea.length])); });
+    mesh.receiveShadow = true; mesh.computeBoundingSphere();
+    scene.add(mesh);
+  }
+  plantationCount = mats.length;
 }
+let plantationCount = 0;
 
 // foreign hikers walking the stage the other way; they step aside and wave as the team passes
 const TOURIST_KM = [1.75, 3.3, 4.7, 6.95, 9.3, 11.1];
@@ -1374,6 +1407,12 @@ function update(dt, time) {
     P.root.rotation.y = angleLerp(P.root.rotation.y, walker.v < -0.5 ? heading + Math.PI : heading, Math.min(1, dt * 8));
     animateWalk(P, dt, moving, rate);
     if (P === rainGear.dinusha && rainGear.umbrella.visible) { P.armR.rotation.x = -1.2; P.armR.rotation.z = 0; } // holding the umbrella
+    if (P.chocolate) { // handing chocolates to the kids at the kovil and the flower stop
+      const giving = card && (card.event === 'kovil' || card.event === 'flowers');
+      P.chocolate.visible = giving;
+      if (giving) { P.armR.rotation.x = -1.35 + Math.sin(time * 2 + k) * 0.08; P.armR.rotation.z = 0; P.body.rotation.y = (card.side === 'right' ? -1 : 1) * 0.9; } // turn toward the kids
+      else P.body.rotation.y = 0;
+    }
     if (k === CAM_FOLLOW) p.copy(q);
     if (k === CAM_LOOK) look.copy(q);
   });
@@ -1422,7 +1461,9 @@ function update(dt, time) {
   for (const L of landmarks) {
     L.marker.orbM.position.y = 7.3 + Math.sin(time * 2 + L.s) * 0.35;
     L.marker.orbM.rotation.y += dt;
-    if (Math.abs(walker.s - L.s) < CONFIG.TRIGGER_M) {
+    // story stops (kids, kovil, stream, people) trigger right beside the scene so the team stops there
+    const dd = walker.s - L.s;
+    if (L.event ? dd > -3 && dd < 15 : Math.abs(dd) < CONFIG.TRIGGER_M) {
       if (!L.visited && started && !card && !finished) openCard(L);
       if (!nearLandmark || Math.abs(walker.s - L.s) < Math.abs(walker.s - nearLandmark.s)) nearLandmark = L;
     }
@@ -1480,7 +1521,7 @@ async function selfCheck(counts) {
   const urls = [...new Set(landmarks.flatMap((l) => l.photos ?? []))];
   const bad = (await Promise.all(urls.map((u) => fetch(u, { method: 'HEAD' }).then((r) => (r.ok ? null : u)).catch(() => u)))).filter(Boolean);
   check('photos reachable', !bad.length, bad.length ? bad.join(', ') : `${urls.length} photos`);
-  check('props placed', true, JSON.stringify(counts));
+  check('props placed', true, JSON.stringify({ ...counts, plantation: plantationCount }));
   console.table(rows);
   window.__selfCheck = rows;
 }

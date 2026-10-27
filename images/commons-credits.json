@@ -79,5 +79,21 @@
     "license": "CC BY-SA 4.0",
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
     "size": "4128x3096"
+  },
+  {
+    "file": "images/commons-flower-bouquet.jpg",
+    "title": "File:Bouquet of wild flowers.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Bouquet_of_wild_flowers.jpg",
+    "artist": "Liilia Moroz",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0"
+  },
+  {
+    "file": "images/commons-chocolate.jpg",
+    "title": "File:Chocolate.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Chocolate.jpg",
+    "artist": "André Karwath aka Aka",
+    "license": "CC BY-SA 2.5",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.5"
   }
 ]

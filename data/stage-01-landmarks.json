@@ -223,7 +223,8 @@
       "confidence": "medium",
       "text": "A small roadside Hindu kovil on the right of the road, with village kids around it.",
       "photos": [
-        "photos/Small Hindu kovil.jpg"
+        "photos/Small Hindu kovil.jpg",
+        "photos/commons-chocolate.jpg"
       ],
       "story": "We filled our water bottles at the kovil and gave 5 chocolates to the kids at the temple.",
       "event": "kovil",
@@ -239,7 +240,9 @@
       "source": "team memory",
       "confidence": "low",
       "text": "More kids along the road, just after the kovil.",
-      "photos": [],
+      "photos": [
+        "photos/Chocolates for flowers.jpg"
+      ],
       "story": "We gave 2 more chocolates to some kids, and they gave us a bouquet of flowers in return.",
       "event": "flowers",
       "side": "right"

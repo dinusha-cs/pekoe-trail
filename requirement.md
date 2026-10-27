@@ -6,7 +6,7 @@
 |---|---|---|
 | `index.html` | The whole app (Three.js from the jsDelivr CDN) | hand-written |
 | `the-pekoe-trail-stage-1-hantana-to-galaha-official-profile.gpx` | Route (Wikiloc export, 12.84 km) | provided |
-| `data/stage-01-landmarks.json` | 21 landmarks: km, side, text, story, photos | `tools/build-landmarks.py` |
+| `data/stage-01-landmarks.json` | 19 landmarks: km, side, text, story, photos | `tools/build-landmarks.py` |
 | `data/terrain/*.png`, `manifest.json` | Elevation tiles (AWS Terrain Tiles, zoom 13) | `tools/fetch-terrain.ps1` |
 | `photos/` | Images used by the page (resized copies of `images/`) | `tools/resize-photos.ps1` |
 | `photos/logo.png` | Trail logo: favicon, signboards, dialogs | from `images/logo.png` |
@@ -20,9 +20,7 @@ Put new photos in `images/`. Name them after the place, e.g. `small-kovil-1.jpg`
 
 ### Landmarks with no photo yet (cards show a placeholder)
 
-| Landmark | km | Wanted |
-|---|---|---|
-| Chocolates for flowers | 8.2 | The flower bouquet |
+None. Every stop has at least one photo.
 
 ### Stand-in photos to replace with our own
 
@@ -34,6 +32,7 @@ These come from Wikimedia Commons (`images/commons-*.jpg`). They show the right 
 - descent views
 - Galaha town (second photo)
 - Galaha Post Office (second photo)
+- kovil: a stock chocolate photo (second photo)
 
 Our own photo of each place would be better.
 

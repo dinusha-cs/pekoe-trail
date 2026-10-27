@@ -43,5 +43,15 @@
     "artist": "calflier001",
     "license": "CC BY-SA 2.0",
     "source": "https://commons.wikimedia.org/wiki/File:KANDY_TEA_MUSEUM_KANDY_TOWN_SRI_LANKA_JAN_2013_(8583226551).jpg"
+  },
+  "photos/commons-flower-bouquet.jpg": {
+    "artist": "Liilia Moroz",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Bouquet_of_wild_flowers.jpg"
+  },
+  "photos/commons-chocolate.jpg": {
+    "artist": "André Karwath aka Aka",
+    "license": "CC BY-SA 2.5",
+    "source": "https://commons.wikimedia.org/wiki/File:Chocolate.jpg"
   }
 }
