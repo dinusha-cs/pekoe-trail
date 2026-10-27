@@ -33,7 +33,6 @@ Five people, modelled from `photos/team.jpeg`. Walking order, front to back:
 | 7–8 km | Very light rain. Dinusha used an umbrella, Sudesh a raincoat, the others had nothing |
 | ~8 km, right side | Small Hindu kovil. We filled our water bottles and gave 5 chocolates to the kids at the temple |
 | Just after the kovil | Gave 2 more chocolates to other kids, and they gave us a flower bouquet |
-| Stream crossing the road, right side | Everyone had a bath; Adithya had a full bath |
 
 ## Start: Ceylon Tea Museum
 

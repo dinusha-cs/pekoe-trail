@@ -48,7 +48,7 @@ L = [
  ("meditation-stupa", "Side trail to meditation stupa", 5.13, "site 5.2 km", "medium",
   "Short detour to a secluded meditation stupa.", ["photos/Side trail to meditation stupa.webp"]),
  ("pine-boulders", "Pines & boulders near the top", 5.4, "photo match", "low",
-  "Pine stand and boulders on the final climb.", ["photos/s5.webp", "photos/14f6abed-42e4-4042-b526-4b6b5a9957e7.jpg"]),
+  "Pine stand and boulders on the final climb.", ["photos/s5.webp"]),
  ("summit", "Highest point & viewpoint", 5.76, "gpx max elevation", "high",
   "Top of the stage (~1,067 m): views to Victoria Reservoir and the Knuckles Range.",
   ["photos/6b7c7e89-1ba8-403e-9352-8cfd27ec10e5.jpg", "photos/e8863e5d-b664-4757-b5e9-6a708027dec6.jpg"]),
@@ -57,21 +57,19 @@ L = [
   ["photos/team.jpeg", "photos/s9.webp", "photos/s6.webp", "photos/86164203-752f-4b10-93bf-c3e182e4ed20.jpg"]),
  ("valley-view", "Descent views", 7.5, "photo match", "low",
   "Long views over layered hills on the way down.", ["photos/s7.webp", "photos/commons-hantana-after-rain.jpg"]),
- ("stone-stream", "Stream crossing the road", 8.5, "team memory", "medium",
-  "A stream crosses the road here; the stone-lined pool is on the right-hand side.", ["photos/s13.webp"]),
  ("small-kovil", "Small Hindu kovil", 8.0, "team memory", "medium",
   "A small roadside Hindu kovil on the right of the road, with village kids around it.",
-  ["photos/Small Hindu kovil.jpg", "photos/commons-chocolate.jpg"]),
+  ["photos/Small Hindu kovil.jpg"]),
  ("kids-flowers", "Chocolates for flowers", 8.2, "team memory", "low",
-  "More kids along the road, just after the kovil.", ["photos/Chocolates for flowers.jpg"]),
+  "More kids along the road, just after the kovil.", []),
  ("film-site", "Temple of Doom film area", 9.87, "site ~10 km", "medium",
   "Dense forest section linked to the filming of Indiana Jones and the Temple of Doom.",
   ["photos/indian-johns-doom-temple.jpg", "photos/indian-johns-doom-temple-2.jpg"]),
  ("pine-forest", "Pine forest road", 10.66, "site 10.8 km", "medium",
-  "Pine forest near the end of the stage; slippery in rain.", ["photos/61ef04d7-6cbb-45ab-b76a-461e941594d8.jpg"]),
+  "Pine forest near the end of the stage; slippery in rain.", []),
  ("galaha-town", "Galaha town", 12.5, "photo match", "medium",
   "Into Galaha: shops, a Hindu kovil and trail arrows on the walls.",
-  ["photos/304b1253-fee2-4197-8995-59cd39b0214a.jpg", "photos/commons-galaha-1.jpg"]),
+  ["photos/commons-galaha-1.jpg"]),
  ("galaha-post-office", "Galaha Post Office (finish)", 12.67, "osm", "high",
   "End of Stage 1.", ["photos/Galaha Post Office.jpg", "photos/commons-galaha.jpg"]),
 ]
@@ -84,14 +82,13 @@ out = {
   "landmarks": [],
 }
 # side of the trail (walking direction) where the place is
-SIDE = {"sandagiri-stupa": "left", "small-kovil": "right", "kids-flowers": "right", "stone-stream": "right"}
+SIDE = {"sandagiri-stupa": "left", "small-kovil": "right", "kids-flowers": "right"}
 STORY = {
   "galaha-town": ("We met a few people along the trail; locals were happy to chat with five hikers.", "locals"),
   "tea-estate": ("Tea pluckers at work on the slopes, one of the many people we met on the way.", "pluckers"),
   "katusu-konda": ("Team photo under the Katusu Konda cliffs: Adithya, Sudesh, Dinusha, Theshawa and Sithara.", None),
   "small-kovil": ("We filled our water bottles at the kovil and gave 5 chocolates to the kids at the temple.", "kovil"),
   "kids-flowers": ("We gave 2 more chocolates to some kids, and they gave us a bouquet of flowers in return.", "flowers"),
-  "stone-stream": ("Bath time where the stream crosses the road! Everyone cooled off, and Adithya went all in for a full bath.", "bath"),
 }
 for id_, name, km, src, conf, text, photos in L:
     lat, lon, ele = at_km(km)

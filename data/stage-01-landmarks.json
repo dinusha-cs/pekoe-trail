@@ -143,8 +143,7 @@
       "confidence": "low",
       "text": "Pine stand and boulders on the final climb.",
       "photos": [
-        "photos/s5.webp",
-        "photos/14f6abed-42e4-4042-b526-4b6b5a9957e7.jpg"
+        "photos/s5.webp"
       ]
     },
     {
@@ -196,23 +195,6 @@
       ]
     },
     {
-      "id": "stone-stream",
-      "name": "Stream crossing the road",
-      "km": 8.5,
-      "lat": 7.217673,
-      "lon": 80.64969,
-      "ele": 962,
-      "source": "team memory",
-      "confidence": "medium",
-      "text": "A stream crosses the road here; the stone-lined pool is on the right-hand side.",
-      "photos": [
-        "photos/s13.webp"
-      ],
-      "story": "Bath time where the stream crosses the road! Everyone cooled off, and Adithya went all in for a full bath.",
-      "event": "bath",
-      "side": "right"
-    },
-    {
       "id": "small-kovil",
       "name": "Small Hindu kovil",
       "km": 8.0,
@@ -223,8 +205,7 @@
       "confidence": "medium",
       "text": "A small roadside Hindu kovil on the right of the road, with village kids around it.",
       "photos": [
-        "photos/Small Hindu kovil.jpg",
-        "photos/commons-chocolate.jpg"
+        "photos/Small Hindu kovil.jpg"
       ],
       "story": "We filled our water bottles at the kovil and gave 5 chocolates to the kids at the temple.",
       "event": "kovil",
@@ -240,9 +221,7 @@
       "source": "team memory",
       "confidence": "low",
       "text": "More kids along the road, just after the kovil.",
-      "photos": [
-        "photos/Chocolates for flowers.jpg"
-      ],
+      "photos": [],
       "story": "We gave 2 more chocolates to some kids, and they gave us a bouquet of flowers in return.",
       "event": "flowers",
       "side": "right"
@@ -272,9 +251,7 @@
       "source": "site 10.8 km",
       "confidence": "medium",
       "text": "Pine forest near the end of the stage; slippery in rain.",
-      "photos": [
-        "photos/61ef04d7-6cbb-45ab-b76a-461e941594d8.jpg"
-      ]
+      "photos": []
     },
     {
       "id": "galaha-town",
@@ -287,7 +264,6 @@
       "confidence": "medium",
       "text": "Into Galaha: shops, a Hindu kovil and trail arrows on the walls.",
       "photos": [
-        "photos/304b1253-fee2-4197-8995-59cd39b0214a.jpg",
         "photos/commons-galaha-1.jpg"
       ],
       "story": "We met a few people along the trail; locals were happy to chat with five hikers.",

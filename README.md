@@ -18,14 +18,14 @@ Version 1 covers Stage 1 only. Later stages can reuse the same page with their o
 
 - **The real route and terrain:** the official Stage 1 GPX track laid over real elevation data, drawn in a low-poly style. You pass through tea estates, pine forest, the Katusu Konda cliffs and down into Galaha.
 - **Our team of five:** they start together at the museum and mostly walk in single file. From time to time they walk two by two.
-- **Landmarks with photo cards:** 19 stops, each with a glowing marker and a framed photo beside the path.
+- **Landmarks with photo cards:** 18 stops, each with a glowing marker and a framed photo beside the path.
   - Walk up to a marker, or click it, to open its card with photos and the story.
 - **Our story along the trail:**
   - Hanthana Sandagiri Maha Seya, seen on the left in the first kilometre.
   - Light rain between 7 and 8 km (an umbrella and a raincoat come out).
   - Water and chocolates for the kids at a small Hindu kovil.
   - A flower bouquet in return for more chocolates.
-  - A bath where a stream crosses the road.
+  - At the end in Galaha, a "Welcome to Stage 2" arch and a bus stop with buses back to Kandy.
 - **Life on the trail:**
   - Women plucking tea in the plantations.
   - Locals.

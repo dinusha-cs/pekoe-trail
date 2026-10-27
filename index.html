@@ -885,6 +885,59 @@ function buildSigns() {
   });
   placeBoard(buildBoard(mapTex, 7, 7 * 1200 / 1024, 1.4), START_S + 40, 8, 'right');
   placeBoard(buildBoard(logoBoard('Galaha', 'End of Pekoe Trail Stage 1 · 12.8 km'), 10, 2.8, 2.6), trail.len - 35, 7, 'left');
+  stageEnd();
+}
+
+// Galaha: welcome arch where Stage 2 begins, and the bus stop for buses back to Kandy
+function stageEnd() {
+  const m = (c) => lambert({ color: c });
+  // arch across the path
+  const arch = new THREE.Group(), wood = m('#6b4a2f');
+  for (const sx of [-5, 5]) arch.add(new THREE.Mesh(new THREE.BoxGeometry(0.5, 8, 0.5).translate(sx, 4, 0), wood));
+  arch.add(new THREE.Mesh(new THREE.BoxGeometry(11, 2.6, 0.3).translate(0, 7.2, 0), wood));
+  const banner = new THREE.Mesh(new THREE.PlaneGeometry(10.6, 2.3), new THREE.MeshBasicMaterial({ map: boardTexture(1280, 278, (ctx, w, h) => {
+    ctx.fillStyle = '#2f6b33'; ctx.fillRect(0, 0, w, h);
+    if (IMG.logo) ctx.drawImage(IMG.logo, 16, 16, h - 32, h - 32);
+    ctx.fillStyle = '#fff8e6'; fitText(ctx, 'Welcome to Stage 2', h + 10, h * 0.38, w - h - 30, 96);
+    ctx.fillStyle = '#d9f0c8'; fitText(ctx, 'Stage 1 ends here · Stage 2 starts from here', h + 10, h * 0.74, w - h - 30, 44, 500);
+  }) }));
+  banner.position.set(0, 7.2, 0.16); arch.add(banner);
+  const s = trail.len - 12, p = posAt(s, new THREE.Vector3()), f = posAt(s - 30, new THREE.Vector3());
+  placeAt(arch, p.x, p.z, f.x, f.z);
+
+  // bus shelter with a timetable board, on the right of the road
+  const bs = trail.len - 60, t = tangentAt(bs, 3), q = posAt(bs, new THREE.Vector3());
+  const shelter = new THREE.Group(), steel = m('#4b5563');
+  for (const sx of [-4, 4]) shelter.add(new THREE.Mesh(new THREE.BoxGeometry(0.3, 5.5, 0.3).translate(sx, 2.75, -1.6), steel));
+  shelter.add(new THREE.Mesh(new THREE.BoxGeometry(9.5, 0.3, 4).translate(0, 5.6, -0.6), m('#b91c1c')));
+  shelter.add(new THREE.Mesh(new THREE.BoxGeometry(8, 3.6, 0.15).translate(0, 2.6, -1.8), m('#e5e7eb')));
+  shelter.add(new THREE.Mesh(new THREE.BoxGeometry(7, 0.25, 1).translate(0, 1.4, -1.2), m('#6b4a2f')));
+  const board = new THREE.Mesh(new THREE.PlaneGeometry(6.4, 3), new THREE.MeshBasicMaterial({ map: boardTexture(1024, 480, (ctx, w, h) => {
+    ctx.fillStyle = '#fef3c7'; ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#b91c1c'; ctx.fillRect(0, 0, w, 110);
+    ctx.fillStyle = '#fff'; fitText(ctx, 'BUS STOP · Galaha', w / 2, 56, w - 40, 72, 800, 'center');
+    ctx.fillStyle = '#1f2937'; fitText(ctx, 'Buses to Kandy', 40, 170, w - 80, 56, 800);
+    ctx.font = '500 40px system-ui, sans-serif';
+    ['Galaha → Kandy', 'Galaha → Peradeniya → Kandy', 'Galaha → Hanthana → Kandy'].forEach((r, k) => ctx.fillText(`• ${r}`, 50, 250 + k * 70));
+  }) }));
+  board.position.set(0, 2.9, -1.7); shelter.add(board);
+  const sx = q.x - t.z * 9, sz = q.z + t.x * 9;
+  placeAt(shelter, sx, sz, q.x, q.z);
+
+  // a bus waiting at the stop, destination KANDY
+  const bus = new THREE.Group();
+  bus.add(new THREE.Mesh(new THREE.BoxGeometry(4, 4.6, 17).translate(0, 3.1, 0), m('#dc2626')));
+  bus.add(new THREE.Mesh(new THREE.BoxGeometry(4.05, 1.4, 15).translate(0, 4, -0.6), m('#1f2937'))); // windows
+  bus.add(new THREE.Mesh(new THREE.BoxGeometry(4.05, 0.5, 17.05).translate(0, 1.6, 0), m('#facc15'))); // stripe
+  for (const [wx, wz] of [[-2, 5.5], [2, 5.5], [-2, -5.5], [2, -5.5]])
+    bus.add(new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 0.6, 12).rotateZ(Math.PI / 2).translate(wx, 1, wz), m('#111827')));
+  const dest = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 0.8), new THREE.MeshBasicMaterial({ map: boardTexture(512, 120, (ctx, w, h) => {
+    ctx.fillStyle = '#111'; ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#fbbf24'; fitText(ctx, 'KANDY  ·  මහනුවර', w / 2, h / 2, w - 20, 64, 800, 'center');
+  }) }));
+  dest.position.set(0, 4.95, 8.53); bus.add(dest);
+  const bq = posAt(bs + 4, new THREE.Vector3()), bf = posAt(bs + 30, new THREE.Vector3());
+  placeAt(bus, bq.x - t.z * 5.4, bq.z + t.x * 5.4, bf.x - t.z * 5.4, bf.z + t.x * 5.4);
 }
 
 // framed photo on a stand beside each landmark (own .jpg photos first); click it to open the card
@@ -1487,7 +1540,9 @@ function showFinish() {
   const seen = landmarks.filter((l) => l.visited).length;
   $('finishStats').innerHTML = `You walked <b>${(gpxLen / 1000).toFixed(2)} km</b> from Hanthana to Galaha.<br>
     Climb <b>${Math.round(gain)} m</b> · descent <b>${Math.round(loss)} m</b> · high point <b>${Math.round(Math.max(...gpx.map((p) => p.ele)))} m</b><br>
-    Landmarks seen: <b>${seen} / ${landmarks.length}</b>`;
+    Landmarks seen: <b>${seen} / ${landmarks.length}</b><br><br>
+    <b>Stage 2 starts from here. Welcome to Stage 2!</b><br>
+    Heading back? Buses to Kandy leave from the Galaha bus stop.`;
   $('finish').classList.remove('hidden');
 }
 function restartWalk() {
