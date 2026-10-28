@@ -28,13 +28,14 @@ def at_km(km):
 L = [
  ("tea-museum", "Ceylon Tea Museum (trailhead)", 0.00, "osm", "high",
   "Start of Stage 1, in the former Hantana tea factory. The top floor has a tea shop and tea tasting room.",
-  ["photos/commons-tea-museum.jpg", "photos/Museum top floor-1.webp", "photos/s12.webp", "photos/s4.webp"]),
+  ["photos/commons-tea-museum.jpg", "photos/Museum top floor-1.webp", "photos/Museum top floor ceylon tea museum-2.jpg",
+   "photos/s12.webp", "photos/s4.webp"]),
  ("sandagiri-stupa", "Hanthana Sandagiri Maha Seya", 0.95, "osm + team memory", "high",
   "The white Sandagiri Maha Seya on the ridge, seen on the left of the trail in the first kilometre.",
   ["photos/sandagiri-seya.jpg", "photos/s3.webp"]),
  ("kandy-view", "View back over Hanthana & Knuckles", 2.0, "photo match", "medium",
   "Looking back at the Hanthana towers, the stupa and the Knuckles range on the horizon.",
-  ["photos/s11.webp", "photos/commons-hantana-highest-peak.jpg"]),
+  ["photos/view-2-km.jpeg", "photos/s11.webp", "photos/commons-hantana-highest-peak.jpg"]),
  ("shooting-club", "W15 Hotel & Hill Country Sport Shooting Club", 2.85, "osm", "high",
   "Trail passes W15 Hanthana and the shooting club.", ["photos/W15 Hotel.jpg", "photos/commons-hanthana-galaha-road.jpg"]),
  ("sugarcane", "Sugarcane Quarantine Center", 3.06, "site 3.1 km", "medium",
@@ -42,6 +43,8 @@ L = [
   ["photos/Sugarcane Quarantine Center.jpg", "photos/commons-hanthana-galaha-road-2.jpg"]),
  ("boulder-field", "Boulders above the valley", 3.6, "photo match", "low",
   "Granite boulders among the trees with the towered Hanthana peak behind.", ["photos/s8.webp", "photos/commons-hantana-peaks.jpg"]),
+ ("katusu-view", "First view of Katusu Konda", 4.0, "photo name (4 km)", "medium",
+  "The bare rock face of Katusu Konda rises above the forest ahead.", ["photos/katusu-konda-4-km.jpeg"]),
  ("tea-estate", "Hanthana tea estate", 4.2, "photo match", "low",
   "Shaded estate roads between tea bushes and tall shade trees; often misty.",
   ["photos/s2-1.webp", "photos/s10.webp", "photos/s1.webp", "photos/ba16e881-66b6-4146-8e22-0a1d752ab970.jpg"]),
@@ -52,26 +55,33 @@ L = [
  ("summit", "Highest point & viewpoint", 5.76, "gpx max elevation", "high",
   "Top of the stage (~1,067 m): views to Victoria Reservoir and the Knuckles Range.",
   ["photos/6b7c7e89-1ba8-403e-9352-8cfd27ec10e5.jpg", "photos/e8863e5d-b664-4757-b5e9-6a708027dec6.jpg"]),
+ ("sandagiri-lookback", "Looking back toward Sandagiri Seya", 6.0, "photo name (6 km)", "medium",
+  "From the ridge you look back over the forest and hills toward the Sandagiri Seya, now far behind.",
+  ["photos/sandagiriseya-from-6-km.jpeg"]),
  ("katusu-konda", "Katusu Konda rock faces", 6.61, "osm", "high",
   "Sheer rock cliffs of the Katusu Konda range above the trail. Look for the trail's painted rock markers.",
-  ["photos/team.jpeg", "photos/s9.webp", "photos/s6.webp", "photos/86164203-752f-4b10-93bf-c3e182e4ed20.jpg"]),
+  ["photos/team.jpeg", "photos/team-2.jpeg", "photos/s9.webp", "photos/s6.webp", "photos/86164203-752f-4b10-93bf-c3e182e4ed20.jpg"]),
+ ("big-tree", "Lone tree on the descent", 7.0, "photo name (7 km)", "medium",
+  "A big spreading tree above the tea, with the Katusu Konda ridge behind.", ["photos/tree-7-km.jpeg"]),
  ("valley-view", "Descent views", 7.5, "photo match", "low",
   "Long views over layered hills on the way down.", ["photos/s7.webp", "photos/commons-hantana-after-rain.jpg"]),
+ ("stone-stream", "Stream crossing the road", 8.5, "team memory", "medium",
+  "A stream crosses the road here; the pool is on the right-hand side.", []),
  ("small-kovil", "Small Hindu kovil", 8.0, "team memory", "medium",
   "A small roadside Hindu kovil on the right of the road, with village kids around it.",
-  ["photos/Small Hindu kovil.jpg"]),
+  ["photos/Small Hindu kovil.jpg", "photos/team-3-8-km.jpeg"]),
  ("kids-flowers", "Chocolates for flowers", 8.2, "team memory", "low",
   "More kids along the road, just after the kovil.", []),
  ("film-site", "Temple of Doom film area", 9.87, "site ~10 km", "medium",
   "Dense forest section linked to the filming of Indiana Jones and the Temple of Doom.",
-  ["photos/indian-johns-doom-temple.jpg", "photos/indian-johns-doom-temple-2.jpg"]),
+  ["photos/indian-johns-1.jpg", "photos/indian-johns-doom-temple.jpg", "photos/indian-johns-doom-temple-2.jpg"]),
  ("pine-forest", "Pine forest road", 10.66, "site 10.8 km", "medium",
   "Pine forest near the end of the stage; slippery in rain.", []),
  ("galaha-town", "Galaha town", 12.5, "photo match", "medium",
   "Into Galaha: shops, a Hindu kovil and trail arrows on the walls.",
   ["photos/commons-galaha-1.jpg"]),
  ("galaha-post-office", "Galaha Post Office (finish)", 12.67, "osm", "high",
-  "End of Stage 1.", ["photos/Galaha Post Office.jpg", "photos/commons-galaha.jpg"]),
+  "End of Stage 1.", ["photos/Galaha Post Office.jpg", "photos/trail-end.jpeg", "photos/commons-galaha.jpg"]),
 ]
 
 out = {
@@ -82,13 +92,14 @@ out = {
   "landmarks": [],
 }
 # side of the trail (walking direction) where the place is
-SIDE = {"sandagiri-stupa": "left", "small-kovil": "right", "kids-flowers": "right"}
+SIDE = {"sandagiri-stupa": "left", "small-kovil": "right", "kids-flowers": "right", "stone-stream": "right"}
 STORY = {
   "galaha-town": ("We met a few people along the trail; locals were happy to chat with five hikers.", "locals"),
   "tea-estate": ("Tea pluckers at work on the slopes, one of the many people we met on the way.", "pluckers"),
   "katusu-konda": ("Team photo under the Katusu Konda cliffs: Adithya, Sudesh, Dinusha, Theshawa and Sithara.", None),
   "small-kovil": ("We filled our water bottles at the kovil and gave 5 chocolates to the kids at the temple.", "kovil"),
   "kids-flowers": ("We gave 2 more chocolates to some kids, and they gave us a bouquet of flowers in return.", "flowers"),
+  "stone-stream": ("Bath time where the stream crosses the road! Everyone cooled off, and Adithya went all in for a full bath.", "bath"),
 }
 for id_, name, km, src, conf, text, photos in L:
     lat, lon, ele = at_km(km)

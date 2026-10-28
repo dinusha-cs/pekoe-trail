@@ -11,9 +11,9 @@ $codec = [System.Drawing.Imaging.ImageCodecInfo]::GetImageEncoders() | Where-Obj
 $params = New-Object System.Drawing.Imaging.EncoderParameters 1
 $params.Param[0] = New-Object System.Drawing.Imaging.EncoderParameter ([System.Drawing.Imaging.Encoder]::Quality), 82L
 
-Get-ChildItem $src -File | ForEach-Object {
+Get-ChildItem $src -File | Where-Object Extension -in '.jpg', '.jpeg', '.png', '.webp' | ForEach-Object {
   $target = Join-Path $dst $_.Name
-  if ($_.Extension -ne '.jpg') { Copy-Item $_.FullName $target -Force; return }
+  if ($_.Extension -notin '.jpg', '.jpeg') { Copy-Item $_.FullName $target -Force; return }
   $img = [System.Drawing.Image]::FromFile($_.FullName)
   try {
     # Respect EXIF orientation (tag 0x0112) so portrait phone shots stay upright.

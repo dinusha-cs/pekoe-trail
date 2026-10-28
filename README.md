@@ -1,10 +1,18 @@
-# Pekoe Trail Walk: Stage 1
+# Beyond the Trail
+
+**Smiles, Kindness, and Rural Life in Sri Lanka’s Central Highlands**
 
 A virtual 3D walk through **Stage 1 of the Pekoe Trail** in Sri Lanka. The stage runs 12.8 km from the Ceylon Tea Museum in Hanthana to the Galaha Post Office. It runs in the browser.
 
 ## Purpose
 
-The [Pekoe Trail](https://thepekoetrail.org/) is a long-distance hiking trail through Sri Lanka's tea country. This project retells our own walk of Stage 1 as an interactive scene:
+The [Pekoe Trail](https://thepekoetrail.org/) is a long-distance hiking trail through Sri Lanka's tea country. This project is about more than the route. It's about the people and village life we met along it:
+- the tea pluckers;
+- the kids we shared chocolates with, who gave us flowers in return;
+- the kovil where we filled our water bottles;
+- the hikers who waved as they passed.
+
+It retells our own walk of Stage 1 as an interactive scene:
 
 - It follows the real route and the real hills (GPS track and elevation data).
 - It shows the places along the way, each with photos.
@@ -18,14 +26,28 @@ Version 1 covers Stage 1 only. Later stages can reuse the same page with their o
 
 - **The real route and terrain:** the official Stage 1 GPX track laid over real elevation data, drawn in a low-poly style. You pass through tea estates, pine forest, the Katusu Konda cliffs and down into Galaha.
 - **Our team of five:** they start together at the museum and mostly walk in single file. From time to time they walk two by two.
-- **Landmarks with photo cards:** 18 stops, each with a glowing marker and a framed photo beside the path.
+- **Landmarks with photo cards:** 22 stops, each with a glowing marker and a framed photo beside the path.
   - Walk up to a marker, or click it, to open its card with photos and the story.
 - **Our story along the trail:**
   - Hanthana Sandagiri Maha Seya, seen on the left in the first kilometre.
   - Light rain between 7 and 8 km (an umbrella and a raincoat come out).
   - Water and chocolates for the kids at a small Hindu kovil.
   - A flower bouquet in return for more chocolates.
+  - A bath where a stream crosses the road.
   - At the end in Galaha, a "Welcome to Stage 2" arch and a bus stop with buses back to Kandy.
+- **Hill-country trees:**
+  - silver oaks lining the tea estates;
+  - eucalyptus and pines on the high ground;
+  - coconut palms, banana plants and bamboo near the villages;
+  - flowering flame trees.
+
+  They all sway in the wind, a little more during the rain.
+- **Music and nature sounds:** a calm hill-country soundtrack generated live in the browser (no audio files):
+  - a soft pad and a gentle pentatonic melody;
+  - a light hand drum;
+  - birdsong;
+  - the stream near the bath stop;
+  - rain between 7 and 8 km.
 - **Life on the trail:**
   - Women plucking tea in the plantations.
   - Locals.
@@ -67,6 +89,7 @@ Go to **http://localhost:8765/index.html** in a recent Chrome, Edge, Firefox or 
 | Reopen nearby landmark | E | Tap the ★ prompt |
 | Open any landmark | Click its marker or framed photo | Tap it |
 | Start again | — | **⏮** |
+| Music and sounds on / off | M | **🔊 / 🔇** |
 
 On a phone, you can also hold the screen to walk.
 

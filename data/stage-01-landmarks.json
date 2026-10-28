@@ -19,6 +19,7 @@
       "photos": [
         "photos/commons-tea-museum.jpg",
         "photos/Museum top floor-1.webp",
+        "photos/Museum top floor ceylon tea museum-2.jpg",
         "photos/s12.webp",
         "photos/s4.webp"
       ]
@@ -50,6 +51,7 @@
       "confidence": "medium",
       "text": "Looking back at the Hanthana towers, the stupa and the Knuckles range on the horizon.",
       "photos": [
+        "photos/view-2-km.jpeg",
         "photos/s11.webp",
         "photos/commons-hantana-highest-peak.jpg"
       ]
@@ -97,6 +99,20 @@
       "photos": [
         "photos/s8.webp",
         "photos/commons-hantana-peaks.jpg"
+      ]
+    },
+    {
+      "id": "katusu-view",
+      "name": "First view of Katusu Konda",
+      "km": 4.0,
+      "lat": 7.242603,
+      "lon": 80.63165,
+      "ele": 983,
+      "source": "photo name (4 km)",
+      "confidence": "medium",
+      "text": "The bare rock face of Katusu Konda rises above the forest ahead.",
+      "photos": [
+        "photos/katusu-konda-4-km.jpeg"
       ]
     },
     {
@@ -162,6 +178,20 @@
       ]
     },
     {
+      "id": "sandagiri-lookback",
+      "name": "Looking back toward Sandagiri Seya",
+      "km": 6.0,
+      "lat": 7.23231,
+      "lon": 80.64229,
+      "ele": 1057,
+      "source": "photo name (6 km)",
+      "confidence": "medium",
+      "text": "From the ridge you look back over the forest and hills toward the Sandagiri Seya, now far behind.",
+      "photos": [
+        "photos/sandagiriseya-from-6-km.jpeg"
+      ]
+    },
+    {
       "id": "katusu-konda",
       "name": "Katusu Konda rock faces",
       "km": 6.61,
@@ -173,11 +203,26 @@
       "text": "Sheer rock cliffs of the Katusu Konda range above the trail. Look for the trail's painted rock markers.",
       "photos": [
         "photos/team.jpeg",
+        "photos/team-2.jpeg",
         "photos/s9.webp",
         "photos/s6.webp",
         "photos/86164203-752f-4b10-93bf-c3e182e4ed20.jpg"
       ],
       "story": "Team photo under the Katusu Konda cliffs: Adithya, Sudesh, Dinusha, Theshawa and Sithara."
+    },
+    {
+      "id": "big-tree",
+      "name": "Lone tree on the descent",
+      "km": 7.0,
+      "lat": 7.225928,
+      "lon": 80.645006,
+      "ele": 1035,
+      "source": "photo name (7 km)",
+      "confidence": "medium",
+      "text": "A big spreading tree above the tea, with the Katusu Konda ridge behind.",
+      "photos": [
+        "photos/tree-7-km.jpeg"
+      ]
     },
     {
       "id": "valley-view",
@@ -195,6 +240,21 @@
       ]
     },
     {
+      "id": "stone-stream",
+      "name": "Stream crossing the road",
+      "km": 8.5,
+      "lat": 7.217673,
+      "lon": 80.64969,
+      "ele": 962,
+      "source": "team memory",
+      "confidence": "medium",
+      "text": "A stream crosses the road here; the pool is on the right-hand side.",
+      "photos": [],
+      "story": "Bath time where the stream crosses the road! Everyone cooled off, and Adithya went all in for a full bath.",
+      "event": "bath",
+      "side": "right"
+    },
+    {
       "id": "small-kovil",
       "name": "Small Hindu kovil",
       "km": 8.0,
@@ -205,7 +265,8 @@
       "confidence": "medium",
       "text": "A small roadside Hindu kovil on the right of the road, with village kids around it.",
       "photos": [
-        "photos/Small Hindu kovil.jpg"
+        "photos/Small Hindu kovil.jpg",
+        "photos/team-3-8-km.jpeg"
       ],
       "story": "We filled our water bottles at the kovil and gave 5 chocolates to the kids at the temple.",
       "event": "kovil",
@@ -237,6 +298,7 @@
       "confidence": "medium",
       "text": "Dense forest section linked to the filming of Indiana Jones and the Temple of Doom.",
       "photos": [
+        "photos/indian-johns-1.jpg",
         "photos/indian-johns-doom-temple.jpg",
         "photos/indian-johns-doom-temple-2.jpg"
       ]
@@ -281,6 +343,7 @@
       "text": "End of Stage 1.",
       "photos": [
         "photos/Galaha Post Office.jpg",
+        "photos/trail-end.jpeg",
         "photos/commons-galaha.jpg"
       ]
     }
